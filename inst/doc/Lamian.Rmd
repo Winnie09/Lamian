@@ -78,7 +78,7 @@ names(res)
 
 ### plot the tree structure
 
-```{r fig_plotmclust, fig.height = 2.6, fig.width = 3, fig.align = "center"}
+```{r fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"}
 plotmclust(res, cell_point_size = 0.1, x.lab = 'Principal component 1', y.lab = 'Principal component 2')
 ```
 

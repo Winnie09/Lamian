@@ -26,7 +26,7 @@ res = infer_tree_structure(pca = hca_bm_pca, expression = hca_bm_saver, cellanno
 ## -----------------------------------------------------------------------------
 names(res)
 
-## ----fig_plotmclust, fig.height = 2.6, fig.width = 3, fig.align = "center"----
+## ----fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"------
 plotmclust(res, cell_point_size = 0.1, x.lab = 'Principal component 1', y.lab = 'Principal component 2')
 
 ## -----------------------------------------------------------------------------
