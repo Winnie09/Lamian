@@ -21,13 +21,20 @@ str(hca_bm_pca)
 str(hca_bm_cellanno)
 
 ## -----------------------------------------------------------------------------
-res = infer_tree_structure(pca = hca_bm_pca, expression = hca_bm_saver, cellanno = hca_bm_cellanno, origin.marker = c('CD34'), xlab='Principal component 1', ylab = 'Principal component 2')
+res = infer_tree_structure(pca = hca_bm_pca, 
+                           expression = hca_bm_saver, 
+                           cellanno = hca_bm_cellanno, 
+                           origin.marker = c('CD34'), 
+                           xlab='Principal component 1', 
+                           ylab = 'Principal component 2')
 
 ## -----------------------------------------------------------------------------
 names(res)
 
 ## ----fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"------
-plotmclust(res, cell_point_size = 0.1, x.lab = 'Principal component 1', y.lab = 'Principal component 2')
+plotmclust(res, cell_point_size = 0.1, 
+           x.lab = 'Principal component 1', 
+           y.lab = 'Principal component 2')
 
 ## -----------------------------------------------------------------------------
 result <- evaluate_uncertainty(res, n.permute=3)
@@ -58,7 +65,11 @@ str(expdata$pseudotime)
 print(expdata$design)
 
 ## -----------------------------------------------------------------------------
-Res <- lamian.test(expr = expdata$expr, cellanno = expdata$cellanno, pseudotime = expdata$pseudotime, design = expdata$design, test.type = 'variable')
+Res <- lamian.test(expr = expdata$expr, 
+                   cellanno = expdata$cellanno, 
+                   pseudotime = expdata$pseudotime, 
+                   design = expdata$design, 
+                   test.type = 'variable')
 
 ## -----------------------------------------------------------------------------
 ## get differential dynamic genes statistics 
@@ -78,7 +89,7 @@ Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
 Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
 table(Res$cluster)
 
-## ----fig_plotClusterMeanAndDiff, fig.height = 8, fig.width = 3.5, fig.align = "center"----
+## ----fig_plotClusterMeanAndDiff, fig.height = 7, fig.width = 3.5, fig.align = "center"----
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 
@@ -94,7 +105,12 @@ plotFitHm(Res, type = 'variable', cellWidthTotal = 200, cellHeightTotal = 350)
 plotDiffFitHm3(Res, cellWidthTotal = 180, cellHeightTotal = 350)
 
 ## -----------------------------------------------------------------------------
-Res <- lamian.test(expr = expdata$expr, cellanno = expdata$cellanno, pseudotime = expdata$pseudotime, design = expdata$design, test.type = 'time', ncores = 1)
+Res <- lamian.test(expr = expdata$expr, 
+                   cellanno = expdata$cellanno, 
+                   pseudotime = expdata$pseudotime, 
+                   design = expdata$design, 
+                   test.type = 'time', 
+                   ncores = 1)
 names(Res)
 
 ## -----------------------------------------------------------------------------
@@ -118,10 +134,23 @@ plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 #  plotGOEnrich(goRes = goRes)
 
 ## ----fig_sct_plotFitHm, fig.height = 4.5, fig.width = 10, fig.align = "center"----
-plotFitHm(Res, subsampleCell  = F, showCluster = T, type = 'time', cellWidthTotal = 200, cellHeightTotal = 200)
+plotFitHm(
+  Res,
+  subsampleCell  = F,
+  showCluster = T,
+  type = 'time',
+  cellWidthTotal = 200,
+  cellHeightTotal = 200
+)
 
 ## -----------------------------------------------------------------------------
-Res <- cell_prop_test(cellanno = expdata$cellanno, pseudotime = expdata$pseudotime, design = expdata$design, ncores = 4)
+Res <-
+  cell_prop_test(
+    cellanno = expdata$cellanno,
+    pseudotime = expdata$pseudotime,
+    design = expdata$design,
+    ncores = 4
+  )
 
 ## -----------------------------------------------------------------------------
 Res$statistics
