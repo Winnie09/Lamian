@@ -15,7 +15,7 @@ For Windows users, Rtools is also required to be installed. Rtools can be downlo
 
 For mac users, if there is any problem with installation problem, please try download and install clang-8.0.0.pkg from the following URL: https://cloud.r-project.org/bin/macosx/tools/clang-8.0.0.pkg
 
-To install the latest version of Lamian package via Github, run following commands in R:
+To install the latest version of Lamian package via Github, run the following commands in R:
 ```{r }
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -28,11 +28,17 @@ devtools::install_github("Winnie09/Lamian")
 If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below)
 
 ## User Manual
-Check the following page for PDF version of the user manual:
-https://github.com/Winnie09/Lamian/inst/doc/Lamian.pdf
+You may use any of the following ways to access user manual:
+(1) check the following page for PDF version of the user manual: 
+https://github.com/Winnie09/Lamian/vignettes.pdf; or
 
-Check below link for the R code of the user manual.
+(2) run the following commands in R, and then open the pop-up window:
+```{r}
+suppressMessages(library(Lamian))
+vignette('Lamian')
+```
 
+(3) check this link for the R code of the user manual:
 https://github.com/Winnie09/Lamian/inst/doc/Lamian.R
 
 ## Citation 
