@@ -34,7 +34,7 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       fitres.null <- fitpt.m0(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
       return(list(fitres.full = fitres.full, fitres.null = fitres.null))
     } else {
-      perpsn <- sapply(rownames(design), function(s){
+      perpsn <- lapply(rownames(design), function(s){
         tmpid <- cellanno[cellanno[,2] == s, 1]  # subset cells
         tmppsn <- pseudotime[names(pseudotime) %in% tmpid] # subset time
         names(tmppsn) <- sample(names(tmppsn)) # permute time
