@@ -16,7 +16,7 @@ plotGenePopulation(
   ncol = NA,
   subSampleNumber = NA,
   line.size = 1,
-  axis.text.blank = F
+  axis.text.blank = FALSE
 )
 }
 \arguments{

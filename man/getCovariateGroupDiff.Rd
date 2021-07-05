@@ -23,7 +23,7 @@ This function is used to obtain the covariate group difference of the genes in s
 }
 \examples{
 data(mantestobj)
-a = getCovariateGroupDiff(testobj = mantestobj, gene = rownames(expr)[1:2])
+a = getCovariateGroupDiff(testobj = mantestobj, gene = rownames(expr)[seq_len(2)])
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

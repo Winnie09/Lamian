@@ -20,7 +20,7 @@ plotGene(
   sep = NA,
   palette = "Dark2",
   ncol = NULL,
-  axis.text.blank = F,
+  axis.text.blank = FALSE,
   cellProp = FALSE,
   x.lab = "Pseudotime",
   y.lab = "Expression"

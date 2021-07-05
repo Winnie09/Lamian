@@ -11,7 +11,7 @@ clusterGene(
   k.auto = FALSE,
   k = 5,
   method = "kmeans",
-  scale.difference = F
+  scale.difference = FALSE
 )
 }
 \arguments{

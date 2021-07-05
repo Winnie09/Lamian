@@ -11,7 +11,7 @@ fitpt.m0(
   design,
   EMmaxiter = 100,
   EMitercutoff = 0.1,
-  verbose = F
+  verbose = FALSE
 )
 }
 \arguments{
@@ -37,7 +37,7 @@ This function is used to perform the model 0 (beta0 for intercept base only) fit
 }
 \examples{
 Data(mandata)
-a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=F)
+a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

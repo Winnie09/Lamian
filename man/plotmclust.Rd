@@ -9,13 +9,13 @@ plotmclust(
   x = 1,
   y = 2,
   MSTorder = NULL,
-  show_tree = T,
-  show_full_tree = T,
-  show_cell_names = F,
+  show_tree = TRUE,
+  show_full_tree = TRUE,
+  show_cell_names = FALSE,
   cell_name_size = 3,
   cell_point_size = 3,
   markerexpr = NULL,
-  showcluster = T,
+  showcluster = TRUE,
   x.lab = "PC1",
   y.lab = "PC2",
   subset.cell = NULL
@@ -30,7 +30,7 @@ plotmclust(
 
 \item{show_tree}{Whether to show the links between cells connected in the minimum spanning tree.}
 
-\item{show_full_tree}{Whether to show the full tree or not. Only useful when show_tree=T. Overrides MSTorder.}
+\item{show_full_tree}{Whether to show the full tree or not. Only useful when show_tree=TRUE. Overrides MSTorder.}
 
 \item{show_cell_names}{Whether to draw the name of each cell in the plot.}
 

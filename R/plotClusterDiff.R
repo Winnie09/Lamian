@@ -1,7 +1,7 @@
 #' Plot the cluster mean or of group differnce for a set of genes or plot the group difference for individual genes.
-#' 
+#'
 #' This function is used for plotting the cluster mean of group difference or plotting the group difference for individual genes.
-#' 
+#'
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer reshape2
@@ -18,60 +18,70 @@
 #' @examples
 #' data(mantestobj)
 #' plotClusterDiff(testobj = mantestobj)
-plotClusterDiff <- function(testobj, 
+plotClusterDiff <- function(testobj,
                             gene = names(testobj$cluster),
                             cluster = testobj[['cluster']],
                             each = FALSE,
                             sep = '',
-                            reverse = F, facet.grid = F,
-                            free.scale = T,
-                            axis.text.blank = F){
+                            reverse = FALSE,
+                            facet.grid = FALSE,
+                            free.scale = TRUE,
+                            axis.text.blank = FALSE) {
   a <- ifelse(free.scale, 'free', 'fixed')
-  if ('covariateGroupDiff' %in% names(testobj)){
-    fit <- testobj$covariateGroupDiff[gene, ,drop=FALSE]
+  if ('covariateGroupDiff' %in% names(testobj)) {
+    fit <- testobj$covariateGroupDiff[gene, , drop = FALSE]
   } else {
-    fit <- getCovariateGroupDiff(testobj = testobj, gene = gene, reverse = reverse)
+    fit <-
+      getCovariateGroupDiff(testobj = testobj,
+                            gene = gene,
+                            reverse = reverse)
   }
   colnames(fit) <- seq(1, ncol(fit))
   
-if (each){
-  pd <- melt(fit)
-  colnames(pd) <- c('gene', 'pseudotime', 'covariateGroupDiff')
-  pd[,1] <- sub(sep, '', pd[,1])
-  pd$gene <- factor(as.character(pd$gene), levels = sub(sep, '', gene))
-  if (facet.grid){
-    p <- ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff))+
-      theme_classic()+
-      facet_grid(~gene, scales = a)
-  } else {
-    p <- ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff))+
-      theme_classic()+
-      facet_wrap(~gene, scales = a)
-  }
+  if (each) {
+    pd <- melt(fit)
+    colnames(pd) <- c('gene', 'pseudotime', 'covariateGroupDiff')
+    pd[, 1] <- sub(sep, '', pd[, 1])
+    pd$gene <-
+      factor(as.character(pd$gene), levels = sub(sep, '', gene))
+    if (facet.grid) {
+      p <-
+        ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff)) +
+        theme_classic() +
+        facet_grid( ~ gene, scales = a)
+    } else {
+      p <-
+        ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff)) +
+        theme_classic() +
+        facet_wrap( ~ gene, scales = a)
+    }
     
-}  else {
-  clu = cluster[gene]
-  tmp <- sapply(sort(unique(clu)), function(i){
-    m <- colMeans(fit[clu == i, , drop = FALSE])
-  })
-  colnames(tmp) <- sort(unique(clu))
-  pd <- melt(tmp)
-  
-  colnames(pd) <- c('pseudotime', 'cluster', 'covariateGroupDiff')
-  pd$cluster <- factor(pd$cluster)
-  p <- ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff, color = cluster))+
-    theme_classic() + scale_x_continuous(breaks=c(min(pd$pseudotime),max(pd$pseudotime))) 
-  if (length(unique(pd$cluster)) < 8){
-    p <- p + scale_color_brewer(palette = 'Dark2')
-  } else {
-    p <- p + scale_color_manual(values = colorRampPalette(brewer.pal(8,'Dark2'))(length(unique(pd$cluster))))
+  }  else {
+    clu = cluster[gene]
+    tmp <- sapply(sort(unique(clu)), function(i) {
+      m <- colMeans(fit[clu == i, , drop = FALSE])
+    })
+    colnames(tmp) <- sort(unique(clu))
+    pd <- melt(tmp)
+    
+    colnames(pd) <- c('pseudotime', 'cluster', 'covariateGroupDiff')
+    pd$cluster <- factor(pd$cluster)
+    p <-
+      ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff, color = cluster)) +
+      theme_classic() + scale_x_continuous(breaks = c(min(pd$pseudotime), max(pd$pseudotime)))
+    if (length(unique(pd$cluster)) < 8) {
+      p <- p + scale_color_brewer(palette = 'Dark2')
+    } else {
+      p <-
+        p + scale_color_manual(values = colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$cluster))))
+    }
   }
-}
   if (axis.text.blank) {
-    p <- p + theme(axis.text = element_blank(), axis.ticks = element_blank())
+    p <-
+      p + theme(axis.text = element_blank(), axis.ticks = element_blank())
   } else {
-    p <- p + scale_x_continuous(breaks=c(min(pd$pseudotime),max(pd$pseudotime)))
+    p <-
+      p + scale_x_continuous(breaks = c(min(pd$pseudotime), max(pd$pseudotime)))
   }
-   print(p)
+  print(p)
 }
-

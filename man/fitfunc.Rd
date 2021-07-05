@@ -11,7 +11,7 @@ fitfunc(
   test.type = "Time",
   EMmaxiter = 100,
   EMitercutoff = 0.1,
-  verbose = F,
+  verbose = FALSE,
   ncores = 1,
   expr = expr,
   cellanno = cellanno,
@@ -52,7 +52,7 @@ This function is used to perform model fitting in one permutation setting.
 }
 \examples{
 Data(mandata)
-a = fitfunc(iter = 1, diffType = 'overall', gene = rownames(mandata$expr), test.type = 'Time', EMmaxiter=5, EMitercutoff=10, verbose=F, ncores=1, expr= mandata$expr, cellanno= mandata$cellanno, pseudotime=mandata$pseudotime, design=mandata$design)
+a = fitfunc(iter = 1, diffType = 'overall', gene = rownames(mandata$expr), test.type = 'Time', EMmaxiter=5, EMitercutoff=10, verbose=FALSE, ncores=1, expr= mandata$expr, cellanno= mandata$cellanno, pseudotime=mandata$pseudotime, design=mandata$design)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

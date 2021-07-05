@@ -35,7 +35,6 @@ This function is used to obtain enrich Gene Ontology (GO) terms (currently only 
 }
 \examples{
 data(mantestobj)
-a = GOEnrich(testobj = mantestobj, fdr.cutoff = 0.05, use.clusters = TRUE, type = 'Variable',species = 'human', sep = ':.*')
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

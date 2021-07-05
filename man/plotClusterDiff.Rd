@@ -10,10 +10,10 @@ plotClusterDiff(
   cluster = testobj[["cluster"]],
   each = FALSE,
   sep = "",
-  reverse = F,
-  facet.grid = F,
-  free.scale = T,
-  axis.text.blank = F
+  reverse = FALSE,
+  facet.grid = FALSE,
+  free.scale = TRUE,
+  axis.text.blank = FALSE
 )
 }
 \arguments{

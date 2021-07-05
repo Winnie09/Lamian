@@ -4,7 +4,7 @@
 \alias{evaluate_uncertainty}
 \title{Evaluate the pseudotime tree uncertainty}
 \usage{
-evaluate_uncertainty(inferobj, n.permute, subset.cell = NULL)
+evaluate_uncertainty(inferobj, n.permute, subset.cell = NULL, design = NULL)
 }
 \arguments{
 \item{inferobj}{the output object from function infer_tree_structure().}
@@ -12,6 +12,9 @@ evaluate_uncertainty(inferobj, n.permute, subset.cell = NULL)
 \item{subset.cell}{a character vector of the names of the selected cells where boostrap will happen on. If NULL, then boostrap from all the cells.}
 
 \item{n.permute:}{a numeric number of permutation in the permutation test.}
+}
+\value{
+a list of results
 }
 \description{
 This function is designed to evaluate the pseudotime tree uncertainty, as one of the main functions in lamain module 1.

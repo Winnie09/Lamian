@@ -45,32 +45,20 @@ The module 1 of Lamian is designed for detecting the stability of branches in a 
 We will need a gene by cell expression matrix, the low-dimension representation of the cells, and the cell annotation (which sample each cell belongs to). Here, we use example data **hca_bm_saver**, **hca_bm_pca**, **hca_bm_cellanno** to demonstrate their data structures. Users can read in their own data of interest in this step.
 
 ```{r}
-data(hca_bm_saver)
-data(hca_bm_pca)
-data(hca_bm_cellanno)
+data(man_tree_data)
 ```
 
-**hca_bm_saver** is a gene by cell expression matrix. 
+**man_tree_data** is a list containing gene by cell expression matrix, low-dimension representation (PCA) of the cells, and the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names. 
 ```{r}
-str(hca_bm_saver)
-```
-
- **hca_bm_pca** is the low-dimension representation of the cells.
-```{r}
-str(hca_bm_pca)
-```
-
-**hca_bm_cellanno** is the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names. 
-```{r}
-str(hca_bm_cellanno)
+str(man_tree_data)
 ```
 
 ### 2.2 infer tree structure
 
 ```{r}
-res = infer_tree_structure(pca = hca_bm_pca, 
-                           expression = hca_bm_saver, 
-                           cellanno = hca_bm_cellanno, 
+res = infer_tree_structure(pca = man_tree_data[['pca']], 
+                           expression = man_tree_data[['expression']], 
+                           cellanno = man_tree_data[['cellanno']], 
                            origin.marker = c('CD34'), 
                            xlab='Principal component 1', 
                            ylab = 'Principal component 2')
@@ -84,14 +72,14 @@ names(res)
 ##### plot the tree structure
 
 ```{r fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"}
-plotmclust(res, cell_point_size = 0.1, 
+plotmclust(res, cell_point_size = 0.5, 
            x.lab = 'Principal component 1', 
            y.lab = 'Principal component 2')
 ```
 
 ## 2.3 evaluate the uncertainty of tree branches
 ```{r}
-result <- evaluate_uncertainty(res, n.permute=3)
+result <- evaluate_uncertainty(res, n.permute=5)
 names(result)
 ```
 
@@ -115,7 +103,7 @@ result[[3]]
 
 # Module 2: Trajectory differential tests
 
-### 2.1 sample covariate test
+### 2.1 XDE test
 
 #### data preparation
 
@@ -147,13 +135,15 @@ print(expdata$design)
 
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
-#### perform sample covariate test
+#### perform XDE test
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, but in this small example we set it as **5** to saver the running time. We recommend setting it as 100 or higher in real applications. 
 ```{r}
 Res <- lamian.test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
-                   test.type = 'variable')
+                   test.type = 'variable', 
+                   permuiter = 5)
 ```
 
 #### downstream analysis
@@ -186,7 +176,7 @@ table(Res$cluster)
 ```
 
 ##### plot the cluster mean and difference
-```{r fig_plotClusterMeanAndDiff, fig.height = 7, fig.width = 3.5, fig.align = "center"}
+```{r fig_plotClusterMeanAndDiff, fig.height = 14, fig.width = 7, fig.align = "center"}
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 ```
@@ -194,7 +184,7 @@ We can also plot the cluster difference seperately by calling `plotClusterDiff(t
 
 ##### GO analysis
 We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis.
-```{r, fig_plotGOEnrich, fig.height = 2.6, fig.width = 3, fig.align = "center", eval=FALSE}
+```{r, fig_plotGOEnrich, fig.height = 5.5, fig.width = 9, fig.align = "center", eval=FALSE}
 ## GO analysis
 goRes <- GOEnrich(testobj = Res, type = 'variable')  
 plotGOEnrich(goRes = goRes, fdr.cutoff = 0.05, fc.cutoff = 2)
@@ -204,20 +194,18 @@ In practice, if there are significant GO terms in the clusters, the above `plotG
 ![](/Users/wenpinhou/Dropbox/trajectory_variability/package/Lamian/data/hm_GO_term_fdr.png)
 
 ##### compare original and fitted expression
-```{r fig_plotFitHm, fig.height = 8, fig.width = 12, fig.align = "center"}
-plotFitHm(Res, type = 'variable', cellWidthTotal = 200, cellHeightTotal = 350)
-```
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps, as follows.
-```{r fig_sct_plotDiffFitHm3, fig.height = 9, fig.width = 16, fig.align = "center"}
-plotDiffFitHm3(Res, cellWidthTotal = 180, cellHeightTotal = 350)
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"}
+colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
+plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 ```
-### 2.2 constant time test
+### 2.2 TDE test
 
 #### data preparation
 The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
 
-#### perform constant time test
+#### perform TDE test
 ```{r}
 Res <- lamian.test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
@@ -253,7 +241,7 @@ Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
 ```
 
 ##### plot cluster mean
-```{r fig_sct_plotclustermean, fig.height = 2.3, fig.width = 3.3, fig.align = "center"}
+```{r fig_sct_plotclustermean, fig.height = 7, fig.width = 8, fig.align = "center"}
 plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 ```
 
@@ -264,11 +252,11 @@ plotGOEnrich(goRes = goRes)
 ```
 
 ##### compare original and fitted expression
-```{r fig_sct_plotFitHm, fig.height = 4.5, fig.width = 10, fig.align = "center"}
-plotFitHm(
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"}
+plotTDEHm(
   Res,
-  subsampleCell  = F,
-  showCluster = T,
+  subsampleCell  = FALSE,
+  showCluster = TRUE,
   type = 'time',
   cellWidthTotal = 200,
   cellHeightTotal = 200

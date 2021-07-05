@@ -19,7 +19,7 @@ plotGeneCellAndPopulation(
   line.alpha = 1,
   point.size = 0.2,
   point.alpha = 0.2,
-  axis.text.blank = F,
+  axis.text.blank = FALSE,
   dot.quantile = 1
 )
 }

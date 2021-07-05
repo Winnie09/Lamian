@@ -13,6 +13,9 @@ findbranch(mst, order, origin)
 
 \item{origin}{a numeric number indicating the origin cluster.}
 }
+\value{
+a list of branch
+}
 \description{
 This function will take the  minimum spanning tree object from the output (a list) of TSCAN::exprmclust() and enumerate all tree branches.
 }

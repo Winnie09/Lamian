@@ -11,7 +11,7 @@ cluster_gene(
   k.auto = FALSE,
   type = "time",
   method = "kmeans",
-  scale.difference = F
+  scale.difference = FALSE
 )
 }
 \arguments{

@@ -12,12 +12,12 @@ lamian.test(
   permuiter = 100,
   EMmaxiter = 100,
   EMitercutoff = 0.1,
-  verbose = F,
+  verbose = FALSE,
   ncores = detectCores(),
   test.type = "Time",
   return.all.data = TRUE,
   demean = FALSE,
-  overall.only = F,
+  overall.only = FALSE,
   test.method = "permutation",
   ncores.fit = 1,
   fix.all.zero = TRUE,
@@ -58,6 +58,9 @@ lamian.test(
 \item{cutoff}{a numeric number to set the cutoff for the standard deviation of gene expression in any one of the samples. Only useful when fix.all.zero == TRUE.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
+}
+\value{
+a list of results
 }
 \description{
 This function is designed for doing different tests.

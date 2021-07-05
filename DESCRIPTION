@@ -2,15 +2,20 @@ Package: Lamian
 Type: Package
 Title: a statistical framework for differential pseudotime analysis in
         multiple single-cell RNA-seq samples
-Version: 0.0.1
+Version: 0.99.0
 Date: 2021-04-22
-Author: Wenpin Hou <whou10@jhu.edu>
-Maintainer: Wenpin Hou <whou10@jhu.edu>
+Authors@R: person("Wenpin", "Hou", email = "wp.hou3@gmail.com", role = c("cre","aut"), comment = c(ORCID = "0000-0003-0972-2192"))
 Description: lamian is a systematic computational and statistical framework for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cells' pseudotemporal trajectory, evaluate the uncertainty of the trajectory's branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression.
+biocViews: StatisticalMethod, Bayesian, TimeCourse, WorkflowStep, MultipleComparison, GeneExpression, SingleCell, DifferentialExpression
+Encoding: UTF-8
 License: GPL-2
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+Imports: devtools, grid, ggplot2, gridExtra, igraph, matrixcalc,
+        Matrix, RColorBrewer, TSCAN, org.Hs.eg.db, pheatmap, plyr,
+        parallel, reshape2, scattermore, stats, topGO, viridis,
+        splines, circlize, ComplexHeatmap
 Suggests: knitr, rmarkdown, markdown
+Depends: R (>= 4.0)
 NeedsCompilation: no
-Packaged: 2021-04-26 12:52:38 UTC; wenpinhou
-Depends: R (>= 3.5.0)
+Packaged: 2021-07-04 16:12:14 UTC; wenpinhou
