@@ -3,6 +3,7 @@
 #' This function is used to plot gene(s) by showing both of the original cellcular gene expression and the sample-level, population-level fitting values.
 #'
 #' @import ggplot2 RColorBrewer splines gridExtra viridis
+#' @importFrom grDevices colorRampPalette
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
@@ -154,9 +155,9 @@ plotGene <-
             geom_point(
               data = pd,
               aes(
-                x = pseudotime,
-                y = expr,
-                color = Sample
+                x = pd[,4],
+                y = pd[,1],
+                color = pd[,2]
               ),
               alpha = point.alpha,
               size = point.size
@@ -164,9 +165,9 @@ plotGene <-
             geom_line(
               data = ld,
               aes(
-                x = pseudotime,
-                y = expr,
-                color = Sample
+                x = ld[,4],
+                y = ld[,1],
+                color = ld[,3]
               ),
               alpha = line.alpha,
               size = line.size

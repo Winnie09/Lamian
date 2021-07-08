@@ -48,7 +48,7 @@ a list containing parameters and number of knots that obtained from the model fo
 This function is used to perform the model fitting.
 }
 \examples{
-Data(mandata)
+data(mandata)
 a = fitpt(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
 }
 \author{

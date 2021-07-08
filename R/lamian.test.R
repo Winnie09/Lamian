@@ -24,7 +24,7 @@
 #' @param fix.all.zero logical. If TRUE (defalt), fix the issue of all zeros in any samples.
 #' @param cutoff a numeric number to set the cutoff for the standard deviation of gene expression in any one of the samples. Only useful when fix.all.zero == TRUE.
 #' @examples
-#' Data(mandata)
+#' data(mandata)
 #' a = lamian.test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
 
 lamian.test <-

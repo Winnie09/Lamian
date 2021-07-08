@@ -61,7 +61,7 @@ plotGOEnrich <-
       factor(as.character(pd$Term), levels = names(v[rev(order(v))]))
     pd$enc <- ifelse(pd$enc, 'Non-significant', 'Significant')
     p <-
-      ggplot(pd, aes(x = Cluster, y = Term, fill = enc)) + geom_tile() + theme_classic() + scale_fill_manual(values =
+      ggplot(pd, aes(x = pd[,2], y = pd[,1], fill = pd[,3])) + geom_tile() + theme_classic() + scale_fill_manual(values =
                                                                                                                c('darkblue', 'orange')) +
       theme(legend.position = 'right') +
       scale_y_discrete(position = "right")

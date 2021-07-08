@@ -16,7 +16,7 @@
 #' data(mandata)
 #' a <- cellPropTest(cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, ncores = 1, permuiter = 2, EMmaxiter = 3)
 
-cell_prop_test <-
+cellPropTest <-
   function(cellanno,
            pseudotime,
            design = NULL,

@@ -66,7 +66,7 @@ a list of results
 This function is designed for doing different tests.
 }
 \examples{
-Data(mandata)
+data(mandata)
 a = lamian.test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
 }
 \author{

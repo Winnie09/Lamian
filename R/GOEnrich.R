@@ -67,7 +67,7 @@ GOEnrich <-
         names(geneList) <- back
         suppressMessages({
           GOdata <-
-            methods::new(
+             new(
               "topGOdata",
               ontology = "BP",
               allGenes = geneList,

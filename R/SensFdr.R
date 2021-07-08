@@ -4,6 +4,7 @@
 #'
 #' @import ggplot2 RColorBrewer splines gridExtra viridis
 #' @return a datafrome. Columns are c('Sensitivity','Real_FDR','Reported_FDR').
+#' @export
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @param TruePositive a character vector of true positive genes.
 #' @param Statistics: a dataframe or matrix, should contain a column of fdr , for example c('FStat','P.Value','adj.P.Val'). Row names are gene names.
@@ -15,7 +16,7 @@ SensFdr <- function(TruePositive, Statistics) {
   ## find the column of fdr
   col.na <- which(colSums(is.na(Statistics)) == nrow(Statistics))
   if (length(col.na) > 0)
-    Statistics <- Statistics[,-col.na, drop = FALSE]
+    Statistics <- Statistics[, -col.na, drop = FALSE]
   fdrchar <-
     intersect(
       colnames(Statistics),
@@ -35,7 +36,8 @@ SensFdr <- function(TruePositive, Statistics) {
   ## if not ordered by significance, then rank by significance
   
   if (sum((diff(Statistics[, fdrcol]) < 0) + 0) > 0) {
-    Statistics <- Statistics[order(Statistics[, fdrcol]), , drop = FALSE]
+    Statistics <-
+      Statistics[order(Statistics[, fdrcol]), , drop = FALSE]
   }
   Order <- rownames(Statistics)
   ## calculate sensitivity, realfdr, reported fdr
@@ -53,3 +55,4 @@ SensFdr <- function(TruePositive, Statistics) {
   colnames(perf) <- c('Sensitivity', 'Real_FDR', 'Reported_FDR')
   rbind(c(0, 0, 0), perf)
 }
+

@@ -5,6 +5,7 @@
 #' @return A ggplot2 plot
 #' @export
 #' @import stats matrixcalc ggplot2 plyr grid igraph
+#' @importFrom grDevices colorRampPalette
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @param x indicates which column in the low-dimrension representation to be used as x-axis coordinates.
 #' @param y indicates which column in the low-dimrension representation to be used as y-axis coordinates.
@@ -58,8 +59,8 @@ plotmclust <-
             by.y = "sample_name")
     edge_df$Marker <- markerexpr[edge_df$sample_name]
     if (!is.null(markerexpr)) {
-      g <- ggplot(data = edge_df, aes(x = pca_dim_1, y = pca_dim_2,
-                                      size = Marker))
+      g <- ggplot(data = edge_df, aes(x = edge_df[,'pca_dim_1'], y = edge_df[,'pca_dim_2'],
+                                      size = edge_df[,'Marker']))
       if (showcluster) {
         g <- g + geom_point(aes_string(color = color_by), na.rm = TRUE) +
           scale_color_manual(values = mypalette(length(unique(edge_df[, color_by]))))

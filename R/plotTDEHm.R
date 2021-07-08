@@ -3,6 +3,7 @@
 #' This function is used for plotting the fitting heatmaps.
 #'
 #' @import ggplot2 RColorBrewer gridExtra viridis pheatmap
+#' @importFrom grDevices colorRampPalette
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export

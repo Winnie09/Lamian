@@ -4,6 +4,7 @@
 #'
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer gridExtra viridis reshape2
+#' @importFrom grDevices colorRampPalette
 #' @export
 #' @return a plot
 #' @param testobj output object from lamian.test(). It is a list.
@@ -43,7 +44,7 @@ plotClusterMean <- function(testobj,
     pd <- do.call(rbind, pd)
     pd$cluster <- factor(pd$cluster)
     p <-
-      ggplot(data = pd) + geom_line(aes(x = pseudotime, y = populationFitClusterMean, color = type),
+      ggplot(data = pd) + geom_line(aes(x = pd[,1], y = pd[,3], color = type),
                                     size = 1) +
       theme_classic() +
       theme(axis.text.x = element_blank()) +

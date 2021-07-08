@@ -91,7 +91,7 @@ predict_fitting <-
         })
         K <- tcrossprod(t(phi[[s]]), sexpr_phibx)
         JK <-
-          rowsum((Jsolve * K[rep(seq_len(nb, nb)), , drop = FALSE]), rep(seq_len(nb), each =
+          rowsum((Jsolve * K[rep(seq_len(nb), nb), , drop = FALSE]), rep(seq_len(nb), each =
                                                                            nb)) ## u's poterior mean
         t(phi[[s]] %*% JK)
       }, simplify = FALSE)

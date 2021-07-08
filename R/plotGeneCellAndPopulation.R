@@ -3,6 +3,7 @@
 #' This function is used to plot genes' using their cellular level expression and the population-level fitting values.
 #'
 #' @import ggplot2 RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export

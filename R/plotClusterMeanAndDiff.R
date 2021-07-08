@@ -5,6 +5,7 @@
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer gridExtra reshape2
+#' @importFrom grDevices colorRampPalette
 #' @export
 #' @param testobj output object from lamian.test(). It is a list.
 #' @param cluster users can defined the clusters of the cells. It is a numeric vector whose names are cell names. By default it is retrieved from testobj object.
@@ -32,7 +33,7 @@ plotClusterMeanAndDiff <- function(testobj,
     tmp <- sapply(sort(unique(clu)), function(i) {
       colMeans(mat[clu == i, , drop = FALSE])
     })
-    tmp <- melt(tmp)
+    tmp <- reshape2::melt(tmp)
     colnames(tmp) <-
       c('pseudotime', 'cluster', 'populationFitClusterMean')
     tmp <- data.frame(tmp, type = names(fit[i]))
@@ -40,7 +41,7 @@ plotClusterMeanAndDiff <- function(testobj,
   pd <- do.call(rbind, pd)
   pd$cluster <- factor(pd$cluster)
   p1 <-
-    ggplot(data = pd) + geom_line(aes(x = pseudotime, y = populationFitClusterMean, color = type),
+    ggplot(data = pd) + geom_line(aes(x = pd[,1], y = pd[,3], color = pd[,4]),
                                   size = 1) +
     theme_classic() +
     facet_wrap( ~ cluster, nrow = length(unique(pd$cluster)), scales = a1) +
@@ -71,7 +72,7 @@ plotClusterMeanAndDiff <- function(testobj,
   colnames(pd2) <- c('pseudotime', 'cluster', 'covariateGroupDiff')
   pd2$cluster <- factor(pd2$cluster)
   p2 <-
-    ggplot(data = pd2) + geom_line(aes(x = pseudotime, y = covariateGroupDiff), size = 1) +
+    ggplot(data = pd2) + geom_line(aes(x = pd2[,1], y = pd2[,3]), size = 1) +
     theme_classic() +
     facet_wrap( ~ cluster, nrow = length(unique(pd2$cluster)), scales = a2) +
     xlab('Pseudotime') + ylab('Group difference')

@@ -6,6 +6,7 @@
 #' @return a list containing parameters and number of knots that obtained from the model for genes.
 #' @export
 #' @import stats Matrix splines matrixcalc parallel
+#' @importFrom matrixcalc %s%
 #' @param expr gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.
 #' @param cellanno a dataframe where the first column are cell names and second column are sample names.
 #' @param pseudotime a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.
@@ -18,7 +19,7 @@
 #' @param model a numeric number (1,2,or 3) indicating which model from the nesting models will be used for fitting.  Model 0 is implemented by the function fitpt.m0().
 #' @param knotnum If NULL (default), this function will automatically select the optimal number of knots for each gene. If specified by a numeric vector whose names are gene names, this function will used the specified number of knots for those genes. This argument is used to speed up the fitting if the number of knots has been known.
 #' @examples
-#' Data(mandata)
+#' data(mandata)
 #' a = fitpt(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
 fitpt <-
   function(expr,

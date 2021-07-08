@@ -6,6 +6,11 @@
 #' @return a list of two elements. The first is for full model, while the second is for null model. Each element is a list containing data and parameter estimates.
 #' @export
 #' @import stats Matrix splines parallel
+#' @importFrom stats cov2cor
+#' @importFrom stats decompose
+#' @importFrom stats toeplitz
+#' @importFrom stats update
+#' @importFrom stats spectrum
 #' @param expr gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.
 #' @param cellanno a dataframe where the first column are cell names and second column are sample names.
 #' @param pseudotime a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.
@@ -19,7 +24,7 @@
 #' @param test.type the type of test. One of c('Time', 'Variable). Case insensitive.
 #' @param ncores the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.
 #' @examples
-#' Data(mandata)
+#' data(mandata)
 #' a = fitfunc(iter = 1, diffType = 'overall', gene = rownames(mandata$expr), test.type = 'Time', EMmaxiter=5, EMitercutoff=10, verbose=FALSE, ncores=1, expr= mandata$expr, cellanno= mandata$cellanno, pseudotime=mandata$pseudotime, design=mandata$design)
 
 

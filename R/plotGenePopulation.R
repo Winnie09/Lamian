@@ -15,6 +15,7 @@
 #' @param axis.text.blank logical. If TRUE, leave axis text as blank.
 #' @export
 #' @import ggplot2 RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @examples
@@ -78,7 +79,7 @@ plotGenePopulation <- function(testobj,
     
     
     p <-
-      ggplot2::ggplot(data = pd, aes(x = pseudotime, y = expression, color = 'red')) +
+      ggplot2::ggplot(data = pd, aes(x = pd[,3], y = pd[,2], color = 'red')) +
       geom_line(size = line.size) +
       theme_classic() +
       xlab('Pseudotime') +
@@ -126,10 +127,10 @@ plotGenePopulation <- function(testobj,
     p <-
       ggplot(data = pd,
              aes(
-               x = pseudotime,
-               y = expression,
-               group = type,
-               color = type
+               x = pd[,2],
+               y = pd[,3],
+               group = pd[,4],
+               color = pd[,4]
              )) +
       geom_line(size = line.size) +
       theme_classic() +

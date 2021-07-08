@@ -14,7 +14,7 @@
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
 #' @param verbose logical. If TRUE, print intermediate information.
 #' @examples
-#' Data(mandata)
+#' data(mandata)
 #' a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
 fitpt.m0 <-
   function(expr,

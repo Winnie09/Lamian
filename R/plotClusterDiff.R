@@ -5,6 +5,7 @@
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer reshape2
+#' @importFrom grDevices colorRampPalette
 #' @export
 #' @param testobj output object from lamian.test(). It is a list.
 #' @param gene a vector of gene names.
@@ -46,12 +47,12 @@ plotClusterDiff <- function(testobj,
       factor(as.character(pd$gene), levels = sub(sep, '', gene))
     if (facet.grid) {
       p <-
-        ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff)) +
+        ggplot(data = pd) + geom_line(aes(x = pd[,2], y = pd[,3])) +
         theme_classic() +
         facet_grid( ~ gene, scales = a)
     } else {
       p <-
-        ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff)) +
+        ggplot(data = pd) + geom_line(aes(x = pd[,2], y = pd[,3])) +
         theme_classic() +
         facet_wrap( ~ gene, scales = a)
     }
@@ -67,7 +68,7 @@ plotClusterDiff <- function(testobj,
     colnames(pd) <- c('pseudotime', 'cluster', 'covariateGroupDiff')
     pd$cluster <- factor(pd$cluster)
     p <-
-      ggplot(data = pd) + geom_line(aes(x = pseudotime, y = covariateGroupDiff, color = cluster)) +
+      ggplot(data = pd) + geom_line(aes(x = pd[,1], y = pd[,3], color = pd[,2])) +
       theme_classic() + scale_x_continuous(breaks = c(min(pd$pseudotime), max(pd$pseudotime)))
     if (length(unique(pd$cluster)) < 8) {
       p <- p + scale_color_brewer(palette = 'Dark2')

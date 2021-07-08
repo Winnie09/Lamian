@@ -6,6 +6,9 @@
 #' @return a list
 #' @export
 #' @import TSCAN scattermore RColorBrewer
+#' @importFrom grDevices pdf
+#' @importFrom grDevices dev.off
+#' @importFrom grDevices colorRampPalette
 #' @param  pca cell by principal component (pc) matrix. Principal components reduction of the cells.
 #' @param cellanno 2-column or 3-column dataframe/matrix, first column is cell name, second column is sample, third column (if exists) is cell type.
 #' @param expression only useful when users want to use highly expressed marker genes to determine the starting point of pseudotime. It is a gene by cell expression matrix. The values should be library-size-normalized and log-transformed expression values. They can either be imputed or non-imputed.
@@ -53,14 +56,14 @@ infer_tree_structure <-
     pd = data.frame(x = pr[, 1],
                     y = pr[, 2],
                     cluster = as.factor(clu[rownames(pr)]))
-    mypalette = RColorBrewer::colorRampPalette(brewer.pal(9, 'Set1'))
+    mypalette = colorRampPalette(brewer.pal(9, 'Set1'))
     if (!is.na(plotdir)) {
       pdf(paste0(plotdir, 'cluster.pdf'),
           width = 3,
           height = 2.1)
       print(
         ggplot(data = pd, aes(
-          x = x, y = y, color = cluster
+          x = pd[,1], y = pd[,2], color = pd[,3]
         )) +
           geom_scattermore() +
           scale_color_manual(values = mypalette(max(clu))) +
@@ -132,7 +135,7 @@ infer_tree_structure <-
           height = 2.1)
       print(
         ggplot(data = pd, aes(
-          x = pc1, y = pc2, color = time
+          x = pd[,1], y = pd[,2], color = time
         )) +
           geom_scattermore() +
           scale_color_gradient(low = 'yellow', high = 'blue') +

@@ -51,7 +51,7 @@ a list of two elements. The first is for full model, while the second is for nul
 This function is used to perform model fitting in one permutation setting.
 }
 \examples{
-Data(mandata)
+data(mandata)
 a = fitfunc(iter = 1, diffType = 'overall', gene = rownames(mandata$expr), test.type = 'Time', EMmaxiter=5, EMitercutoff=10, verbose=FALSE, ncores=1, expr= mandata$expr, cellanno= mandata$cellanno, pseudotime=mandata$pseudotime, design=mandata$design)
 }
 \author{

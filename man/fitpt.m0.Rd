@@ -36,7 +36,7 @@ a list containing parameters in the model 0 for genes.
 This function is used to perform the model 0 (beta0 for intercept base only) fitting.
 }
 \examples{
-Data(mandata)
+data(mandata)
 a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
 }
 \author{

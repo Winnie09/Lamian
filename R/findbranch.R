@@ -4,6 +4,7 @@
 #'
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import stats igraph
+#' @importFrom igraph degree
 #' @return a list of branch
 #' @param mst minimum spanning tree object. It is MSTtree element in the output (a list) of TSCAN::exprmclust().
 #' @param order a list of cell orders. Each element is a vector of cells. It is the output (a list) of TSCAN::TSCANorder().
