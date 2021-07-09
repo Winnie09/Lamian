@@ -1,4 +1,6 @@
 Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq
+
+Wenpin Hou, Zhicheng Ji, Zeyu Chen, E. John Wherry, Stephanie C. Hicks\*, Hongkai Ji\*
 ====
 
 ## Introductions
@@ -29,8 +31,8 @@ If there is any problem with the installation process, please make sure you have
 
 ## User Manual
 You may use any of the following ways to access user manual:
-(1) check the following page for PDF version of the user manual: 
-https://github.com/Winnie09/Lamian/vignettes.pdf; or
+(1) check the following page for the user manual: 
+https://winnie09.github.io/Wenpin_Hou/pages/Lamian.html
 
 (2) run the following commands in R, and then open the pop-up window:
 ```{r}
@@ -38,14 +40,11 @@ suppressMessages(library(Lamian))
 vignette('Lamian')
 ```
 
-(3) check this link for the R code of the user manual:
-https://github.com/Winnie09/Lamian/inst/doc/Lamian.R
-
 ## Citation 
 (paper info here)
 
 ## Contact
-Author: Wenpin Hou
+Author: Wenpin Hou, 
 
 Report bugs and provide suggestions by sending email to:
 
