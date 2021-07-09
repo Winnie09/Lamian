@@ -1,6 +1,6 @@
-#Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq#
+# Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq
 
-###Wenpin Hou, Zhicheng Ji, Zeyu Chen, E. John Wherry, Stephanie C. Hicks\*, Hongkai Ji\*###
+### Wenpin Hou, Zhicheng Ji, Zeyu Chen, E. John Wherry, Stephanie C. Hicks\*, Hongkai Ji\*
 ====
 
 ## Introductions
