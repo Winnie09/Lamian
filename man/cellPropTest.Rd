@@ -10,7 +10,8 @@ cellPropTest(
   design = NULL,
   permuiter = 100,
   EMmaxiter = 100,
-  ncores = detectCores()
+  ncores = detectCores(),
+  test.type = "Time"
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ cellPropTest(
 \item{EMmaxiter}{the number of EM iterations. Value will be passed to the "EMmaxiter" of lamian.test().}
 
 \item{ncores}{number of cores. if ncores > 1, then implement in parallel mode.}
+
+\item{test.type}{the type of test. test.type = 'Time', use TCD test. test.type = 'Variable', use XCD test.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
 }

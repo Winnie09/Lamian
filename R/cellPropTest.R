@@ -12,6 +12,7 @@
 #' @param ncores number of cores. if ncores > 1, then implement in parallel mode.
 #' @param permuiter the number of permutation. Value will be passed to the "permuiter" of lamian.test().
 #' @param EMmaxiter the number of EM iterations. Value will be passed to the "EMmaxiter" of lamian.test().
+#' @param test.type the type of test. test.type = 'Time', use TCD test. test.type = 'Variable', use XCD test.
 #' @examples
 #' data(mandata)
 #' a <- cellPropTest(cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, ncores = 1, permuiter = 2, EMmaxiter = 3)
@@ -22,7 +23,8 @@ cellPropTest <-
            design = NULL,
            permuiter = 100,
            EMmaxiter = 100,
-           ncores = detectCores()) {
+           ncores = detectCores(),
+           test.type = 'Time') {
     ptw <-
       cut(pseudotime, seq(min(pseudotime), max(pseudotime), length.out = 100), include.lowest = TRUE)
     ptdat <-
@@ -46,7 +48,7 @@ cellPropTest <-
         pseudotime = ptpt,
         design = design,
         ncores = ncores,
-        test.type = 'Variable',
+        test.type = test.type,
         demean = FALSE,
         test.method = 'permutation',
         ncores.fit = 1,

@@ -3,6 +3,7 @@
 export(AreaUnderSensFdr)
 export(GOEnrich)
 export(SensFdr)
+export(branchPropTest)
 export(cellPropTest)
 export(clusterGene)
 export(evaluate_uncertainty)
