@@ -1,0 +1,294 @@
+---
+title: "Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq "
+author: 
+  - name: Wenpin Hou
+    affiliation: 
+      - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
+package: Lamian
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{1. Lamian package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+Pseudotime analysis based on single-cell RNA-seq (scRNA-seq) data has been widely used to study dynamic gene regulatory programs along continuous biological processes such as cell differentiation, immune responses, and disease development. Existing pseudotime analysis methods primarily address the issue of reconstructing cellular pseudotemporal trajectories and inferring gene expression changes along the reconstructed trajectory in one biological sample. As scRNA-seq studies are increasingly performed on multiple patient samples, comparing gene expression dynamics across samples has been emerging as a new demand for which a systematic analytical solution is lacking. 
+
+We develop a systematic computational and statistical framework, Lamian, for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cellular pseudotemporal trajectory, evaluate the uncertainty of the trajectory branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression. Importantly, when identifying cell abundance or gene expression changes associated with pseudotime and sample covariates, Lamian accounts for variability across biological samples which other existing pseudotime methods do not consider. As a result, Lamian is able to more appropriately control the false discovery rate (FDR) when analyzing multi-sample data, a property not offered by any other methods. 
+
+For more details, see our paper describing the **Lamian** package:
+
+- (give paper info here)
+
+
+
+
+```{r}
+# load in Lamian
+options(warn=-1)
+suppressMessages(library(Lamian))
+```
+
+# Module 1: tree variability
+
+The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch's detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples' proportion in each branch. 
+
+### 2.1 data preparation
+
+We will need a gene by cell expression matrix, the low-dimension representation of the cells, and the cell annotation (which sample each cell belongs to). Here, we use example data **hca_bm_saver**, **hca_bm_pca**, **hca_bm_cellanno** to demonstrate their data structures. Users can read in their own data of interest in this step.
+
+```{r}
+data(man_tree_data)
+```
+
+**man_tree_data** is a list containing gene by cell expression matrix, low-dimension representation (PCA) of the cells, and the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names. 
+```{r}
+str(man_tree_data)
+```
+
+### 2.2 infer tree structure
+
+```{r}
+res = infer_tree_structure(pca = man_tree_data[['pca']], 
+                           expression = man_tree_data[['expression']], 
+                           cellanno = man_tree_data[['cellanno']], 
+                           origin.marker = c('CD34'), 
+                           xlab='Principal component 1', 
+                           ylab = 'Principal component 2')
+```
+
+As we can see from the above inputs, there are five clusters, and the tree structure inferred based on these clusters consists of three branches: 2 --> 3 --> 1, 2 --> 4, and 2 --> 5. The result object **res** is a list containing information about the tree structure, branches, cell clusters, pseudotime ordering the cells, etc..
+```{r}
+names(res)
+```
+
+##### plot the tree structure
+
+```{r fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"}
+plotmclust(res, cell_point_size = 0.5, 
+           x.lab = 'Principal component 1', 
+           y.lab = 'Principal component 2')
+```
+
+## 2.3 evaluate the uncertainty of tree branches
+```{r}
+result <- evaluate_uncertainty(res, n.permute=5)
+names(result)
+```
+
+The result is a list of three elements. The first selement is the detection rate of each branch. 
+```{r}
+result[[1]]
+```
+
+The second element is the sample proportion mean information.
+```{r}
+result[[2]]
+```
+
+The thrid element is the sample proportion sd (standard deviation) information. 
+```{r}
+result[[3]]
+```
+
+
+
+
+# Module 2: Trajectory differential tests
+
+### 2.1 XDE test
+
+#### data preparation
+
+In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any other interesting dataset. 
+
+```{r}
+data(expdata)
+```
+
+The inputs should contain: (a) **expr**: a gene by cell expression matrix. Values are library-size-normalized log-transformed gene expression matrix. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out. 
+```{r}
+str(expdata$expr)
+```
+
+(b) **cellanno**: a dataframe where the first column are cell names and second column are sample names. 
+```{r}
+head(expdata$cellanno)
+```
+
+(c) **pseudotime**: a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.
+```{r}
+str(expdata$pseudotime)
+```
+
+(d) **design**: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples. 
+```{r}
+print(expdata$design)
+```
+
+The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
+
+#### perform XDE test
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, but in this small example we set it as **5** to saver the running time. We recommend setting it as 100 or higher in real applications. 
+```{r}
+Res <- lamian.test(expr = expdata$expr, 
+                   cellanno = expdata$cellanno, 
+                   pseudotime = expdata$pseudotime, 
+                   design = expdata$design, 
+                   test.type = 'variable', 
+                   permuiter = 5)
+```
+
+#### downstream analysis
+
+##### identify differential dynamic genes (DDG)
+We will know which are DDG from the **statistics** data frame in the result object **Res**.
+```{r}
+## get differential dynamic genes statistics 
+stat <- Res$statistics
+head(stat)
+stat <- stat[order(stat[,1], -stat[,3]), ]
+diffgene <- rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05,])
+str(diffgene)
+```
+
+##### population-level model-fitted patterns
+We will get the population-level estimates for all the DDG by applying function `getPopulationFit()`.
+```{r}
+## population fit
+Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'variable')
+```
+
+##### clustering
+We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the DDG based on the group difference. By setting **k = 4**, we will get two clusters for meanSig DDG, and the other two clusters for DDG of other types.
+```{r}
+## clustering
+Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
+Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
+table(Res$cluster)
+```
+
+##### plot the cluster mean and difference
+```{r fig_plotClusterMeanAndDiff, fig.height = 14, fig.width = 7, fig.align = "center"}
+## plotClusterMeanAndDiff
+plotClusterMeanAndDiff(Res)
+```
+We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
+
+##### GO analysis
+We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis.
+```{r, eval=FALSE}
+## GO analysis
+goRes <- GOEnrich(testobj = Res, type = 'variable')  
+```
+In practice, if there are significant GO terms in the clusters, the above `plotGOEnrich()` function will generate a heatmap to show the top GO terms, using the command `plotGOEnrich(goRes = goRes)`
+
+##### compare original and fitted expression
+
+We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps, as follows.
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"}
+colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
+plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
+```
+### 2.2 TDE test
+
+#### data preparation
+The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
+
+#### perform TDE test
+```{r}
+Res <- lamian.test(expr = expdata$expr, 
+                   cellanno = expdata$cellanno, 
+                   pseudotime = expdata$pseudotime, 
+                   design = expdata$design, 
+                   test.type = 'time', 
+                   permuiter = 5)
+names(Res)
+```
+
+#### downstream analysis
+The result object is a list containing multiple elements. The first element is a dataframe of statistics. 
+```{r}
+head(Res$statistics)
+```
+
+We can further determine the dynamic genes (DG) as the genes with **fdr.overall** $< 0.05$.
+```{r}
+diffgene <- rownames(Res$statistics)[Res$statistics[,1] < 0.05]
+str(diffgene)
+```
+
+
+##### population-level model-fitted patterns
+We can estimate the population-level fitting for all DG, which is useful for the downstream analysis.
+```{r}
+Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'time')
+```
+
+##### clustering
+```{r}
+Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
+```
+
+##### plot cluster mean
+```{r fig_sct_plotclustermean, fig.height = 7, fig.width = 8, fig.align = "center"}
+plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
+```
+
+##### GO analysis
+```{r eval = FALSE}
+goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')
+plotGOEnrich(goRes = goRes)
+```
+
+##### compare original and fitted expression
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"}
+plotTDEHm(
+  Res,
+  subsampleCell  = FALSE,
+  showCluster = TRUE,
+  type = 'time',
+  cellWidthTotal = 200,
+  cellHeightTotal = 200
+)
+```
+     
+
+### 2.3 cell proportion test
+
+#### data preparation
+The inputs for Cell Proportion test are the same as those for Sample Covariate Test (see above section).
+
+#### perform cell proportion test
+```{r}
+Res <-
+  cellPropTest(
+    cellanno = expdata$cellanno,
+    pseudotime = expdata$pseudotime,
+    design = expdata$design,
+    ncores = 4
+  )
+```
+
+The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
+```{r}
+Res$statistics
+```
+
+## Session Info
+
+```{r}
+sessionInfo()
+```
+
+## Citation
+
+If the **Lamian** package is useful in your work, please cite the following paper:
+- (give paper info here)

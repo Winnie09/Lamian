@@ -19,5 +19,7 @@ Imports: devtools, grid, ggplot2, gridExtra, grDevices, igraph,
 Suggests: knitr, rmarkdown, markdown
 Depends: R (>= 4.0)
 NeedsCompilation: no
-Packaged: 2021-07-06 16:59:41 UTC; wenpinhou
+Packaged: 2021-07-07 18:24:51 UTC; wenpinhou
 Authors@R: person("Wenpin", "Hou", email = "wp.hou3@gmail.com", role = c("cre","aut"), comment = c(ORCID = "0000-0003-0972-2192"))
+Author: Wenpin Hou [cre, aut] (<https://orcid.org/0000-0003-0972-2192>)
+Maintainer: Wenpin Hou <wp.hou3@gmail.com>
