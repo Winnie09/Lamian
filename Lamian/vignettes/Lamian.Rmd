@@ -99,7 +99,7 @@ plotmclust(res, cell_point_size = 0.5,
 
 ### evaluate the uncertainty of tree branches
 
-We can call the function **evaluate_uncertainty** to evaluate the tree topology uncertainty. We suggested that users set **n.permute = 100** or more to ensure enough randomness to construct the null distribution, but here we set **n.permute = 5** in order to provide an simplified example. 
+We can call the function **evaluate_uncertainty()** to evaluate the tree topology uncertainty. We suggested that users set **n.permute = 100** or more to ensure enough randomness to construct the null distribution, but here we set **n.permute = 5** in order to provide a simplified example. 
 
 ```{r}
 result <- evaluate_uncertainty(res, n.permute=5)
