@@ -126,6 +126,9 @@ result[[3]]
 
 
 # Module 2: Evaluate differential topoloty
+
+Module 2 of Lamian first identifies variation in tree topology across samples and then assesses if there are differential topological changes associated with sample covariates. For each sample, Lamian calculates the proportion of cells in each tree branch, referred to as *branch cell proportion*. Because a zero or low proportion can reflect absence or depletion of a branch, changes in tree topology can be described using branch cell proportion changes. With multiple samples, Lamian characterizes the cross-sample variation of each branch by estimating the variance of the branch cell proportion across samples. Furthermore, regression models can be fit to test whether the branch cell proportion is associated with sample covariates. This allows one to identify tree topology changes between different conditions, for example in a case-control cohort.
+
 ```{r eval = FALSE}
 data = result[[2]]
 rownames(data) <- c('HSC->myeloid','HSC->erythroid','HSC->lymphocyte')
