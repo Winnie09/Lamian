@@ -45,7 +45,9 @@ We develop a systematic computational and statistical framework, Lamian, for mul
 
 For more details, see our paper describing the **Lamian** package:
 
-- (give paper info here)
+- A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples
+Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks, Hongkai Ji
+bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
 
 # Download 
 
@@ -171,7 +173,7 @@ print(expdata$design)
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
 ### perform XDE test
-We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, but in this small example we set it as **5** to saver the running time. We recommend setting it as 100 or higher in real applications. 
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 ```{r}
 Res <- lamian.test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
@@ -189,6 +191,7 @@ We will know which are XDE from the **statistics** data frame in the result obje
 stat <- Res$statistics
 head(stat)
 stat <- stat[order(stat[,1], -stat[,3]), ]
+## identify XDE genes with FDR.overall < 0.05 cutoff
 diffgene <- rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05,])
 str(diffgene)
 ```
@@ -201,7 +204,7 @@ Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'variable')
 ```
 
 
-We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the DDG based on the group difference. By setting **k = 4**, we will get two clusters for meanSig DDG, and the other two clusters for DDG of other types.
+We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig DDG, and the other two clusters for DDG of other types.
 ```{r}
 ## clustering
 Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
@@ -212,7 +215,7 @@ table(Res$cluster)
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
 ```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"}
-colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
+colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
 plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 ```
 
@@ -224,12 +227,9 @@ plotClusterMeanAndDiff(Res)
 We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
 
 ### downstream analysis 2: Gene ontology (GO) enrichment analysis
-We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis.
-```{r, eval=FALSE}
-## GO analysis
-goRes <- GOEnrich(testobj = Res, type = 'variable')  
-```
-In practice, if there are significant GO terms in the clusters, the above `plotGOEnrich()` function will generate a heatmap to show the top GO terms, using the command `plotGOEnrich(goRes = goRes)`
+We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
+
+In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`.
 
 
 ## TDE test
@@ -238,6 +238,7 @@ In practice, if there are significant GO terms in the clusters, the above `plotG
 The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
 
 ### perform TDE test
+Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 ```{r}
 Res <- lamian.test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
@@ -290,12 +291,7 @@ plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 ```
 
 ### downstream analysis 2: GO analysis for TDE genes
-```{r eval = FALSE}
-goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')
-plotGOEnrich(goRes = goRes)
-```
-
-     
+Similar to **XDE test**, we can further proceed to identify the enriched GO terms for each gene cluster using commands `goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')`. If there are enriched GO terms, we can plot them using commands `plotGOEnrich(goRes = goRes)`.
 
 # Module 4: trajectory differential test based on cell composition
 
@@ -335,6 +331,11 @@ Res <-
     test.type = 'Variable'
   )
 ```
+The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
+```{r}
+head(Res$statistics)
+```
+
 # Session Info
 
 ```{r}
@@ -344,7 +345,9 @@ sessionInfo()
 # Citation
 
 If the **Lamian** package is useful in your work, please cite the following paper:
-- (give paper info here)
+- A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples
+Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks, Hongkai Ji
+bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
 
 # Maintaince or issue reports
 
