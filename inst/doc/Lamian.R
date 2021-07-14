@@ -75,6 +75,7 @@ Res <- lamian.test(expr = expdata$expr,
 stat <- Res$statistics
 head(stat)
 stat <- stat[order(stat[,1], -stat[,3]), ]
+## identify XDE genes with FDR.overall < 0.05 cutoff
 diffgene <- rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05,])
 str(diffgene)
 
@@ -89,16 +90,12 @@ Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
 table(Res$cluster)
 
 ## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"----
-colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
+colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
 plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 
 ## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE----
 #  ## plotClusterMeanAndDiff
 #  plotClusterMeanAndDiff(Res)
-
-## ---- eval=FALSE--------------------------------------------------------------
-#  ## GO analysis
-#  goRes <- GOEnrich(testobj = Res, type = 'variable')
 
 ## -----------------------------------------------------------------------------
 Res <- lamian.test(expr = expdata$expr, 
@@ -136,10 +133,6 @@ plotTDEHm(
 plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')
-#  plotGOEnrich(goRes = goRes)
-
-## ----eval = FALSE-------------------------------------------------------------
 #  Res <-
 #    cellPropTest(
 #      cellanno = expdata$cellanno,
@@ -161,6 +154,9 @@ head(Res$statistics)
 #      ncores = 4,
 #      test.type = 'Variable'
 #    )
+
+## -----------------------------------------------------------------------------
+head(Res$statistics)
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

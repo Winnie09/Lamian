@@ -48,14 +48,12 @@ vignette('Lamian')
 ```
 
 ## Citation 
-(paper info here)
+
+A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples. 
+Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks\*, Hongkai Ji\*. 
+bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
 
 ## Contact
-Author: Wenpin Hou, 
 
-Report bugs and provide suggestions by sending email to:
-
-Maintainer: Wenpin Hou (whou10@jhu.edu)
-
-Or open a new issue on this Github page
+Should you encounter any bugs or have any suggestions, please feel free to contact Wenpin Hou <whou10@jhu.edu>, or open an issue on the Github page https://github.com/Winnie09/Lamian/issues.
 
