@@ -23,7 +23,7 @@ res = infer_tree_structure(pca = man_tree_data[['pca']],
 ## -----------------------------------------------------------------------------
 names(res)
 
-## ----fig_plotmclust, fig.height = 5, fig.width = 6, fig.align = "center"------
+## ----fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'----
 plotmclust(res, cell_point_size = 0.5, 
            x.lab = 'Principal component 1', 
            y.lab = 'Principal component 2')
@@ -40,6 +40,12 @@ result[[2]]
 
 ## -----------------------------------------------------------------------------
 result[[3]]
+
+## ----eval = FALSE-------------------------------------------------------------
+#  data = result[[2]]
+#  rownames(data) <- c('HSC->myeloid','HSC->erythroid','HSC->lymphocyte')
+#  design = data.frame(sample= paste0('BM',1,8), sex = c(0, rep(1,4), rep(0,3)))
+#  branchPropTest(data = data, design = design)
 
 ## -----------------------------------------------------------------------------
 data(expdata)
@@ -82,17 +88,17 @@ Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
 Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
 table(Res$cluster)
 
-## ----fig_plotClusterMeanAndDiff, fig.height = 14, fig.width = 7, fig.align = "center"----
-## plotClusterMeanAndDiff
-plotClusterMeanAndDiff(Res)
+## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"----
+colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
+plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
+
+## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE----
+#  ## plotClusterMeanAndDiff
+#  plotClusterMeanAndDiff(Res)
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  ## GO analysis
 #  goRes <- GOEnrich(testobj = Res, type = 'variable')
-
-## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"----
-colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[1]]) <- colnames(Res$expr) 
-plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 
 ## -----------------------------------------------------------------------------
 Res <- lamian.test(expr = expdata$expr, 
@@ -116,13 +122,6 @@ Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'time')
 ## -----------------------------------------------------------------------------
 Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
 
-## ----fig_sct_plotclustermean, fig.height = 7, fig.width = 8, fig.align = "center"----
-plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
-
-## ----eval = FALSE-------------------------------------------------------------
-#  goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')
-#  plotGOEnrich(goRes = goRes)
-
 ## ----fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"----
 plotTDEHm(
   Res,
@@ -133,17 +132,35 @@ plotTDEHm(
   cellHeightTotal = 200
 )
 
-## -----------------------------------------------------------------------------
-Res <-
-  cellPropTest(
-    cellanno = expdata$cellanno,
-    pseudotime = expdata$pseudotime,
-    design = expdata$design,
-    ncores = 4
-  )
+## ----fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%'----
+plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
+
+## ----eval = FALSE-------------------------------------------------------------
+#  goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')
+#  plotGOEnrich(goRes = goRes)
+
+## ----eval = FALSE-------------------------------------------------------------
+#  Res <-
+#    cellPropTest(
+#      cellanno = expdata$cellanno,
+#      pseudotime = expdata$pseudotime,
+#      design = expdata$design,
+#      ncores = 4,
+#      test.type = 'Time'
+#    )
 
 ## -----------------------------------------------------------------------------
-Res$statistics
+head(Res$statistics)
+
+## ----eval = FALSE-------------------------------------------------------------
+#  Res <-
+#    cellPropTest(
+#      cellanno = expdata$cellanno,
+#      pseudotime = expdata$pseudotime,
+#      design = expdata$design[,1,drop=F],
+#      ncores = 4,
+#      test.type = 'Variable'
+#    )
 
 ## -----------------------------------------------------------------------------
 sessionInfo()
