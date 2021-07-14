@@ -21,8 +21,9 @@ To install the latest version of Lamian package via Github, run the following co
 ```{r }
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
-if (!requireNamespace("TSCAN", quietly = TRUE))
-    BiocManager::install('TSCAN')
+if (!require("devtools"))
+  install.packages("devtools")
+devtools::install_github("zji90/TSCAN")
 if (!requireNamespace("ComplexHeatmap", quietly = TRUE))
     BiocManager::install('ComplexHeatmap')
 if (!require("devtools"))
