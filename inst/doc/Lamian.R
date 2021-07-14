@@ -13,10 +13,12 @@ data(man_tree_data)
 str(man_tree_data)
 
 ## -----------------------------------------------------------------------------
+set.seed(12345)
 res = infer_tree_structure(pca = man_tree_data[['pca']], 
                            expression = man_tree_data[['expression']], 
                            cellanno = man_tree_data[['cellanno']], 
                            origin.marker = c('CD34'), 
+                           number.cluster = 5,
                            xlab='Principal component 1', 
                            ylab = 'Principal component 2')
 
@@ -43,7 +45,7 @@ result[[3]]
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  data = result[[2]]
-#  rownames(data) <- c('HSC->myeloid','HSC->erythroid','HSC->lymphocyte')
+#  rownames(data) <- c('HSC->lymphocyte', 'HSC->myeloid', 'HSC->erythroid')
 #  design = data.frame(sample= paste0('BM',1,8), sex = c(0, rep(1,4), rep(0,3)))
 #  branchPropTest(data = data, design = design)
 
@@ -137,7 +139,7 @@ plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 #    cellPropTest(
 #      cellanno = expdata$cellanno,
 #      pseudotime = expdata$pseudotime,
-#      design = expdata$design,
+#      design = expdata$design[,1,drop=F],
 #      ncores = 4,
 #      test.type = 'Time'
 #    )
@@ -150,7 +152,7 @@ head(Res$statistics)
 #    cellPropTest(
 #      cellanno = expdata$cellanno,
 #      pseudotime = expdata$pseudotime,
-#      design = expdata$design[,1,drop=F],
+#      design = expdata$design,
 #      ncores = 4,
 #      test.type = 'Variable'
 #    )

@@ -83,6 +83,7 @@ res = infer_tree_structure(pca = man_tree_data[['pca']],
                            expression = man_tree_data[['expression']], 
                            cellanno = man_tree_data[['cellanno']], 
                            origin.marker = c('CD34'), 
+                           number.cluster = 5,
                            xlab='Principal component 1', 
                            ylab = 'Principal component 2')
 ```
@@ -134,7 +135,7 @@ Module 2 of Lamian first identifies variation in tree topology across samples an
 
 ```{r eval = FALSE}
 data = result[[2]]
-rownames(data) <- c('HSC->myeloid','HSC->erythroid','HSC->lymphocyte')
+rownames(data) <- c('HSC->lymphocyte', 'HSC->myeloid', 'HSC->erythroid')
 design = data.frame(sample= paste0('BM',1,8), sex = c(0, rep(1,4), rep(0,3)))
 branchPropTest(data = data, design = design)
 ```
