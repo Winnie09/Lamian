@@ -129,7 +129,7 @@ plotTDEHm <-
     ## plot ------------------------
     expr.scale[expr.scale > quantile(as.vector(expr.scale), 0.98)] <-
       quantile(as.vector(expr.scale), 0.98)
-    expr.scale[expr.scale < quantile(as.vector(expr.scale), 0.08)] <-
+    expr.scale[expr.scale < quantile(as.vector(expr.scale), 0.02)] <-
       quantile(as.vector(expr.scale), 0.02)
     fit.scale[fit.scale > quantile(as.vector(fit.scale), 0.98)] <-
       quantile(as.vector(fit.scale), 0.98)
