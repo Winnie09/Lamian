@@ -17,6 +17,11 @@ For Windows users, Rtools is also required to be installed. Rtools can be downlo
 
 For mac users, if there is any problem with installation problem, please try download and install clang-8.0.0.pkg from the following URL: https://cloud.r-project.org/bin/macosx/tools/clang-8.0.0.pkg
 
+For visualization, please download X11 or XQuartz (mac users: https://www.xquartz.org/), and then download the package Cairo using
+```{r}
+install.packages('Cairo')
+```
+
 To install the latest version of Lamian package via Github, run the following commands in R:
 ```{r }
 ## make sure you remove the old version of TSCAN if you've downloaded it before
@@ -34,10 +39,6 @@ devtools::install_github("zji90/TSCAN")
 devtools::install_github("Winnie09/Lamian")
 ```
 
-For visualization, please download X11 or XQuartz (mac users: https://www.xquartz.org/), and then download the package Cairo using
-```{r}
-install.packages('Cairo')
-```
 
 
 If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below).
