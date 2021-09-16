@@ -34,7 +34,12 @@ devtools::install_github("zji90/TSCAN")
 devtools::install_github("Winnie09/Lamian")
 ```
 
-If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below)
+If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below).
+
+For visualization, please download X11 or XQuartz (mac users: https://www.xquartz.org/), and then download the package Cairo using
+```{r}
+install.packages('Cairo')
+```
 
 ## User Manual
 You may use any of the following ways to access user manual:
