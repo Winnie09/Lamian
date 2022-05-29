@@ -17,7 +17,7 @@ plotClusterDiff(
 )
 }
 \arguments{
-\item{testobj}{output object from lamian.test(). It is a list.}
+\item{testobj}{output object from lamian_test(). It is a list.}
 
 \item{gene}{a vector of gene names.}
 

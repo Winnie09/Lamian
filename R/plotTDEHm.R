@@ -2,12 +2,11 @@
 #'
 #' This function is used for plotting the fitting heatmaps.
 #'
-#' @import ggplot2 RColorBrewer gridExtra viridis pheatmap
-#' @importFrom grDevices colorRampPalette
+#' @import ggplot2 RColorBrewer gridExtra viridis pheatmap grDevices
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
-#' @param testobj output object from lamian.test(). It is a list.
+#' @param testobj output object from lamian_test(). It is a list.
 #' @param showRowName logical. If FALSE (default), row names (i.e. gene names) of the heatmaps will not be shown in the plot.
 #' @param cellWidthTotal a numeric number. Total width of each heatmap cell.
 #' @param cellHeightTotal when showRowName = TRUE, cellHeightTotal is suggested to be ten times the number of genes (rows).
@@ -147,7 +146,7 @@ plotTDEHm <-
           stringsAsFactors = FALSE
         )
         
-        col.group = colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$group)))
+        col.group = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$group)))
         names(col.group) = unique(colann$group)
       } else if (toupper(type) == 'TIME') {
         colann <- data.frame(
@@ -161,7 +160,7 @@ plotTDEHm <-
     rownames(colann) = colnames(expr.scale)
     col.expression = brewer.pal(n = 8, name = "Pastel1")[seq_len(2)]
     names(col.expression) = c('Original', 'Model Fitted')
-    col.pseudotime = colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$pseudotime)))
+    col.pseudotime = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$pseudotime)))
     names(col.pseudotime) = unique(colann$pseudotime)
     
     if (is.null(rowann)) {
@@ -180,7 +179,7 @@ plotTDEHm <-
       if (length(unique(clu)) < 8) {
         col.clu = brewer.pal(8, 'Set1')[seq_len(length(unique(clu)))]
       } else {
-        col.clu = colorRampPalette(brewer.pal(8, 'Set1'))[seq_len(length(unique(clu)))]
+        col.clu = grDevices::colorRampPalette(brewer.pal(8, 'Set1'))[seq_len(length(unique(clu)))]
       }
       names(col.clu) = unique(clu)
     }
@@ -204,10 +203,10 @@ plotTDEHm <-
     }
     
     #### save png
-    cpl = colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100)
+    cpl = grDevices::colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100)
     plist <- list()
     
-    p1 <- pheatmap(
+    p1 <- pheatmap::pheatmap(
       expr.scale,
       cluster_rows = FALSE,
       cluster_cols = FALSE,
@@ -242,12 +241,12 @@ plotTDEHm <-
           expression = 'Model Fitted',
           stringsAsFactors = FALSE
         )
-      col.pseudotime = colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime)))
+      col.pseudotime = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime)))
       names(col.pseudotime) = unique(colann.fit$pseudotime)
       annotation_colors$pseudotime <- col.pseudotime
     }
     rownames(colann.fit) = colnames(fit.scale)
-    p2 <- pheatmap(
+    p2 <- pheatmap::pheatmap(
       fit.scale,
       cluster_rows = FALSE,
       cluster_cols = FALSE,
@@ -267,5 +266,6 @@ plotTDEHm <-
     print(grid.arrange(grobs = plist, layout_matrix = matrix(c(
       1, 1, 1, 1, 2, 3, 3, 3, 3
     ), nrow = 1)))
-
+    
   }
+

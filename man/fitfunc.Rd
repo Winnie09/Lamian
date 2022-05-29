@@ -7,16 +7,17 @@
 fitfunc(
   iter,
   diffType = "overall",
-  gene = rownames(expr),
+  gene = NULL,
+  testvar = testvar,
   test.type = "Time",
-  EMmaxiter = 100,
-  EMitercutoff = 0.1,
-  verbose = FALSE,
-  ncores = 1,
   expr = expr,
   cellanno = cellanno,
   pseudotime = pseudotime,
-  design = design
+  design = design,
+  EMmaxiter = 100,
+  EMitercutoff = 0.05,
+  verbose = F,
+  ncores = 1
 )
 }
 \arguments{
@@ -26,7 +27,15 @@ fitfunc(
 
 \item{gene}{a vector of gene names. It is used when users want to externally specify the genes (or specify the order or genes).}
 
+\item{testvar}{a numeric number indicating the column in the design matrix that needs to be tested while controlling for other columns (not intercept). Its value when calls the function will be used. e.g. testvar = 2 means the second column in the design needs to be tested.}
+
 \item{test.type}{the type of test. One of c('Time', 'Variable). Case insensitive.}
+
+\item{expr}{gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.}
+
+\item{cellanno}{a dataframe where the first column are cell names and second column are sample names.}
+
+\item{pseudotime}{a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.}
 
 \item{EMmaxiter}{an integer indicating the number of iterations in the EM algorithm.}
 
@@ -35,12 +44,6 @@ fitfunc(
 \item{verbose}{logical. If TRUE, print intermediate information.}
 
 \item{ncores}{the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.}
-
-\item{expr}{gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.}
-
-\item{cellanno}{a dataframe where the first column are cell names and second column are sample names.}
-
-\item{pseudotime}{a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
 }

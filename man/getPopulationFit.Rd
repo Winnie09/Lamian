@@ -4,7 +4,7 @@
 \alias{getPopulationFit}
 \title{Obtain the population-level fitting of the genes.}
 \usage{
-getPopulationFit(testobj, gene = NULL, type = "time")
+getPopulationFit(testobj, gene = NULL, type = "time", num.timepoint = 1000)
 }
 \arguments{
 \item{testobj}{output object of the function tespt().}
@@ -12,6 +12,8 @@ getPopulationFit(testobj, gene = NULL, type = "time")
 \item{gene}{a vector of gene names}
 
 \item{type}{one of c('Time', 'Variable). Case insensitive.}
+
+\item{num.timepoint}{the number of time points used to fit the curve. Default is the minimum of 1e3 and max(pseudotime). This argument will reduce the running time of both this function and the downstream plot function if there are too many cells.}
 }
 \value{
 a matrix, population fitting of the genes (rows) by cells (ordered by pseudotime)

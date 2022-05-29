@@ -10,8 +10,8 @@ fitpt.m0(
   pseudotime,
   design,
   EMmaxiter = 100,
-  EMitercutoff = 0.1,
-  verbose = FALSE
+  EMitercutoff = 0.05,
+  verbose = F
 )
 }
 \arguments{

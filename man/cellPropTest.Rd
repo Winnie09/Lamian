@@ -8,10 +8,9 @@ cellPropTest(
   cellanno,
   pseudotime,
   design = NULL,
-  permuiter = 100,
-  EMmaxiter = 100,
   ncores = detectCores(),
-  test.type = "Time"
+  test.type = "variable",
+  testvar = 2
 )
 }
 \arguments{
@@ -19,25 +18,23 @@ cellPropTest(
 
 \item{pseudotime}{a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.}
 
-\item{permuiter}{the number of permutation. Value will be passed to the "permuiter" of lamian.test().}
-
-\item{EMmaxiter}{the number of EM iterations. Value will be passed to the "EMmaxiter" of lamian.test().}
-
 \item{ncores}{number of cores. if ncores > 1, then implement in parallel mode.}
 
 \item{test.type}{the type of test. test.type = 'Time', use TCD test. test.type = 'Variable', use XCD test.}
 
+\item{testvar}{a numeric number indicating the column in the design matrix that needs to be tested while controlling for other columns (not intercept). Default is 2. testvar = 2 means the second column in the design needs to be tested.}
+
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
 }
 \value{
-a list. A lamian.test output object except there is one more element of statistics in the list.
+a list. A lamian_test output object except there is one more element of statistics in the list.
 }
 \description{
 This function is used to perform cell proportion test.
 }
 \examples{
 data(mandata)
-a <- cellPropTest(cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, ncores = 1, permuiter = 2, EMmaxiter = 3)
+a <- cellPropTest(cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, ncores = 1)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

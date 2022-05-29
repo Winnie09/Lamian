@@ -20,7 +20,7 @@ plotGenePopulation(
 )
 }
 \arguments{
-\item{testobj}{the output object from lamian.test().}
+\item{testobj}{the output object from lamian_test().}
 
 \item{gene}{a vector of genes that need to do the prediction.}
 

@@ -2,7 +2,7 @@
 #'
 #' This function takes a test output object as input and then plot the population level fitting curves for genes that users specify.
 #'
-#' @param testobj the output object from lamian.test().
+#' @param testobj the output object from lamian_test().
 #' @param gene a vector of genes that need to do the prediction.
 #' @param type One of c('Time', 'Variable').
 #' @param ylim y-axis limits to be passed to ggplot.
@@ -34,10 +34,6 @@ plotGenePopulation <- function(testobj,
                                subSampleNumber = NA,
                                line.size = 1,
                                axis.text.blank = FALSE) {
-  ## testobj: object returned from lamian.test().
-  ## gene: a character vector of gene names. It can be of length 1 or > 1.
-  ## variable: a character (within the column names in design matrix) to get population pattern. If variable == NA, then return testtime fit. Other wise return testvar fit with the variable.
-  
   if (is.na(ncol))
     nrow = round(sqrt(length(gene)))
   else

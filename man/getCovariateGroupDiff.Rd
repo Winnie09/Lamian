@@ -4,7 +4,13 @@
 \alias{getCovariateGroupDiff}
 \title{Obtain the covariate group difference of the genes in sample covariate test.}
 \usage{
-getCovariateGroupDiff(testobj, gene, reverse = FALSE)
+getCovariateGroupDiff(
+  testobj,
+  gene,
+  reverse = FALSE,
+  num.timepoint = 1000,
+  testvar = 2
+)
 }
 \arguments{
 \item{testobj}{output object of the function tespt().}
@@ -12,6 +18,10 @@ getCovariateGroupDiff(testobj, gene, reverse = FALSE)
 \item{gene}{a character vector of genes.}
 
 \item{reverse}{logitcal. FALSE (default) when group 1 - group 0.  TRUE when group 0 - group 1.}
+
+\item{num.timepoint}{the number of time points used to fit the curve. Default is the minimum of 1e3 and max(pseudotime). This argument will reduce the running time of both this function and the downstream plot function if there are too many cells.}
+
+\item{testvar}{a numeric number indicating the column in the design matrix that needs to be used to obtain the covariate group difference. Default is 2. testvar = 2 means the second column in the design matrix.}
 
 \item{output}{a gene by pseudotime matrix. Entries are group difference w.r.t the variable, i.e., the unit-covariate incremental difference.}
 }

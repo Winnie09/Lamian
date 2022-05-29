@@ -7,7 +7,7 @@
 #' @import ggplot2 RColorBrewer reshape2
 #' @importFrom grDevices colorRampPalette
 #' @export
-#' @param testobj output object from lamian.test(). It is a list.
+#' @param testobj output object from lamian_test(). It is a list.
 #' @param gene a vector of gene names.
 #' @param cluster users can defined the clusters of the cells. It is a numeric vector whose names are cell names. By default it is retrieved from testobj object.
 #' @param each logical. If TRUE, the plot for each gene will be generated.

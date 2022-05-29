@@ -7,17 +7,18 @@
 #' @import ggplot2 RColorBrewer gridExtra reshape2
 #' @importFrom grDevices colorRampPalette
 #' @export
-#' @param testobj output object from lamian.test(). It is a list.
+#' @param testobj output object from lamian_test(). It is a list.
 #' @param cluster users can defined the clusters of the cells. It is a numeric vector whose names are cell names. By default it is retrieved from testobj object.
 #' @param free.scale1 logical. If TRUE, free scale the y-axis of the cluster mean plot.
 #' @param free.scale2 logical. If TRUE, free scale the y-axis of the group difference plot.
 #' @examples
 #' data(mantestobj)
 #' plotClusterMeanAndDiff(testobj = mantestobj)
+
 plotClusterMeanAndDiff <- function(testobj, 
-                            cluster = testobj[['cluster']],
-                            free.scale1 = TRUE,
-                            free.scale2 = FALSE){
+                                   cluster = testobj[['cluster']],
+                                   free.scale1 = TRUE,
+                                   free.scale2 = FALSE){
   ## only works for Covariate Test. 
   if ('populationFit' %in% names(testobj)){
     fit <- testobj$populationFit
@@ -53,7 +54,7 @@ plotClusterMeanAndDiff <- function(testobj,
   } else {
     p1 <- p1 + scale_color_manual(values = colorRampPalette(brewer.pal(8,'Dark2'))(length(unique(pd$type))))
   }
-   
+  
   if ('covariateGroupDiff' %in% names(testobj)){
     fit <- testobj$covariateGroupDiff
   } else {
@@ -62,7 +63,7 @@ plotClusterMeanAndDiff <- function(testobj,
   fit <- fit[names(clu), , drop=FALSE]
   colnames(fit) <- seq(1, ncol(fit))
   
-
+  
   tmp <- sapply(sort(unique(clu)), function(i){
     m <- colMeans(fit[clu == i, , drop = FALSE])
   })
@@ -82,6 +83,4 @@ plotClusterMeanAndDiff <- function(testobj,
   }
   grid.arrange(p1,p2,ncol=2)
 }
-
-
 

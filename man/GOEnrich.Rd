@@ -15,7 +15,7 @@ GOEnrich(
 )
 }
 \arguments{
-\item{testobj}{output object of lamian.test()}
+\item{testobj}{output object of lamian_test()}
 
 \item{fdr.cutoff}{FDR cutoff to select "statistically significant" GO terms.}
 

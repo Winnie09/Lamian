@@ -20,7 +20,7 @@ plotXDEHm(
 )
 }
 \arguments{
-\item{testobj}{output object from lamian.test(). It is a list.}
+\item{testobj}{output object from lamian_test(). It is a list.}
 
 \item{showRowName}{logical. If FALSE (default), row names (i.e. gene names) of the heatmaps will not be shown in the plot.}
 
@@ -34,7 +34,7 @@ plotXDEHm(
 
 \item{rowann}{a data frame. Each column represent the annotation feature for the genes. row names should be the same as the name of the genes in the data.}
 
-\item{annotation_colors}{a list. Will be passed onto the annotation_colors input in pheatmap().}
+\item{annotation_colors}{a list. Will be passed onto the annotation_colors input.}
 
 \item{subsampleCell}{logical. If TRUE, will subsample cells.}
 
@@ -43,8 +43,6 @@ plotXDEHm(
 \item{sep}{a string of the gene names that need to removed.}
 
 \item{break.0}{logical. If TRUE (default), the heatmap color scale will strengthen the difference around 0}
-
-\item{type}{One of c('Time', 'Variable')}
 }
 \value{
 a plot

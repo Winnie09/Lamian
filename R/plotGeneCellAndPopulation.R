@@ -7,7 +7,7 @@
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
-#' @param testobj object returned from lamian.test().
+#' @param testobj object returned from lamian_test().
 #' @param gene a character vector of gene names. It can be of length 1 or > 1.
 #' @param type One of c('Time', 'Variable').
 #' @param subSampleNumber a numeric number. If specified, use it as the number of cells subsampled from all cells that will be shown in the plot

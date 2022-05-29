@@ -7,7 +7,7 @@
 predict_fitting(testObj, gene = NULL, test.type = "time")
 }
 \arguments{
-\item{testObj}{the output object from lamian.test().}
+\item{testObj}{the output object from lamian_test().}
 
 \item{gene}{a vector of genes that need to do the prediction.}
 
@@ -17,7 +17,7 @@ predict_fitting(testObj, gene = NULL, test.type = "time")
 a gene by cell (or pseudotime) expression matrix
 }
 \description{
-This function will predict the population fitting for genes using the output from lamian.test().
+This function will predict the population fitting for genes using the output from lamian_test().
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

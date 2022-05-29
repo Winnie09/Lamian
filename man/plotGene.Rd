@@ -27,7 +27,7 @@ plotGene(
 )
 }
 \arguments{
-\item{testobj}{object returned from lamian.test().}
+\item{testobj}{object returned from lamian_test().}
 
 \item{gene}{a character vector of gene names. It can be of length 1 or > 1.}
 

@@ -1,8 +1,8 @@
 #' Predict population fitting.
 #'
-#' This function will predict the population fitting for genes using the output from lamian.test().
+#' This function will predict the population fitting for genes using the output from lamian_test().
 #'
-#' @param testObj the output object from lamian.test().
+#' @param testObj the output object from lamian_test().
 #' @param gene a vector of genes that need to do the prediction.
 #' @param test.type One of c('Time', 'Variable').
 #' @return a gene by cell (or pseudotime) expression matrix

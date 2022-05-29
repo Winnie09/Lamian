@@ -5,12 +5,13 @@
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @return a list containing parameters and number of knots that obtained from the model for genes.
 #' @export
-#' @import stats Matrix splines matrixcalc parallel
+#' @import stats Matrix splines matrixcalc parallel rhdf5
 #' @importFrom matrixcalc %s%
-#' @param expr gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.
-#' @param cellanno a dataframe where the first column are cell names and second column are sample names.
+#' @param expr hdf5 file path and name. 
 #' @param pseudotime a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.
 #' @param design: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.
+#' @param testvar a numeric number indicating the column in the design matrix that needs to be tested while controlling for other columns (not intercept). Its value when calls the function will be used. e.g. testvar = 2 means the second column in the design needs to be tested.
+#' @param targetgene the gene names need to be fitted. if NULL, then read in h5 file "feature" of the first sample. 
 #' @param maxknotallowed a numeric number. Max number of knots applied in the B-spline fitting.
 #' @param EMmaxiter an integer indicating the number of iterations in the EM algorithm.
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
@@ -21,10 +22,20 @@
 #' @examples
 #' data(mandata)
 #' a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
+
+
+
+
+# test.position = 'all'
+# maxknotallowed=10; EMmaxiter=1000; EMitercutoff=0.01; verbose=F; ncores=1; model = 3
+
+# expr: 
 fitpt <- function(expr, 
-                  cellanno, 
                   pseudotime, 
                   design, 
+                  testvar=testvar, 
+                  targetgene=NULL,
+                  boot=NULL, 
                   maxknotallowed=10, 
                   EMmaxiter=100, 
                   EMitercutoff=0.05, 
@@ -32,10 +43,37 @@ fitpt <- function(expr,
                   ncores=1, 
                   model = 3, 
                   knotnum = NULL) {
-  pseudotime <- pseudotime[colnames(expr)]
-  cellanno <- cellanno[match(colnames(expr),cellanno[,1]),]
-  sname <- sapply(row.names(design),function(i) cellanno[cellanno[,2]==i,1],simplify = F)
+  
+  
+  samp <- unname(rownames(design))
+  sname <- sapply(samp,function(s) as.vector(h5read(expr,paste0(s,'/barcode')))) ## each sample's cells, h5read is to read the expr in one sample
+  if (!is.null(boot)) sname <- sapply(sname,function(i) boot[boot[,1] %in% i,2],simplify = F,USE.NAMES = T) ## use new cell names. boot[,1] old names, boot[,2] new (permuted) cell names
+  gn <- h5read(expr,paste0(samp[1],'/feature')) ## read in gene names. since all samples have the same gene names, only need to read in the first sample
+  if (is.null(targetgene)) targetgene <- gn
   design = as.matrix(design)
+  ## most challenging part
+  exprreadfunc <- function(s,geneid) { ## s: the sample to read. geneid: numeric, the gene to read
+    e <- h5read(expr,paste0(s,'/expr'),index=list(geneid,NULL)) ## read in the sample's gene expression on the geneid (a subset of genes)
+    g <- as.vector(h5read(expr,paste0(s,'/feature'))[geneid]) ## read in the gene names
+    rownames(e) <- g ##
+    # if (!is.null(boot)) { ## if boot == NULL, that is, iter = 1. otherwise, redo this step: boostrap cell and rename the cells
+    #   b <- as.vector(h5read(expr,paste0(s,'/barcode')))
+    #   colnames(e) <- b
+    #   bid <- which(boot[,1] %in% b) ## boot has all samples' cell names. bid gets the cells of this sample
+    #   e <- e[,boot[bid,1],drop=F] ## get the expr
+    #   colnames(e) <- boot[bid,2] ## rename the cells
+    #   e[,sname[[s]],drop=F]  ## sname is the new (permuted) cell names
+    # } else {
+    #   e
+    # }
+    if (!is.null(boot)) { ## if boot == NULL, that is, iter = 1. otherwise, redo this step: boostrap cell and rename the cells
+      b <- as.vector(h5read(expr,paste0(s,'/barcode')))
+      bid <- which(boot[,1] %in% b) ## boot has all samples' cell names. bid gets the cells of this sample
+      e <- e[,match(boot[bid,1],b)[match(sname[[s]],boot[bid,2])],drop=F] ## get the expr
+      colnames(e) <- sname[[s]]
+    }
+    e
+  }
   
   philist <- lapply(0:maxknotallowed,function(num.knot) {
     if (num.knot==0) {
@@ -60,15 +98,15 @@ fitpt <- function(expr,
     })) == 1
   }
   maxknot <- maxknot - 1
-  sexpr <- sapply(names(sname),function(ss) expr[,sname[[ss]],drop=F],simplify = F)
   
   ## automatically select knotnum for each gene
   if (is.null(knotnum)){
     bicfunc <- function(num.knot) {
       phi <- philist[[as.character(num.knot)]]
       ll <- sapply(names(sname), function(ss) {
+        sexpr <- exprreadfunc(ss,match(targetgene,gn))
         phiss <- phi[sname[[ss]],,drop=F]
-        dif2 <- sexpr[[ss]] - sexpr[[ss]] %*% (phiss %*% chol2inv(chol(crossprod(phiss)))) %*% t(phiss)
+        dif2 <- sexpr - sexpr %*% (phiss %*% chol2inv(chol(crossprod(phiss)))) %*% t(phiss)
         dif2 <- rowSums(dif2 * dif2)
         s2 <- dif2/(length(sname[[ss]])-ncol(phi))
         log(2*pi*s2)*nrow(phiss) + dif2/s2
@@ -87,47 +125,38 @@ fitpt <- function(expr,
       bic <- sapply(0:maxknot,bicfunc)
     }
     
-    rm('sexpr')
     if (is.vector(bic)){
       knotnum <- c(0:maxknot)[which.min(bic)]
     } else {
       knotnum <- c(0:maxknot)[apply(bic,1,which.min)]
     }
     
-    names(knotnum) <- rownames(expr)
+    names(knotnum) <- targetgene
   } else {
-    knotnum <- knotnum[rownames(expr)]
+    knotnum <- knotnum[targetgene]
   }
   
   sfit <- function(num.knot) {
+    #print(num.knot)
+    #print(paste0('num.knot = ', num.knot))
     gid <- names(which(knotnum==num.knot))
-    sexpr <- expr[gid,,drop=F] ## 
+    #print(gid)
     phi <- philist[[as.character(num.knot)]]
     phicrossprod <- apply(phi,1,tcrossprod)
     phicrossprod <- sapply(names(sname),function(ss) phicrossprod[,sname[[ss]]],simplify = F)
     phi <- sapply(names(sname),function(ss) phi[sname[[ss]],],simplify = F)
     
-    if (model == 0){
-      xs <- sapply(row.names(design), function(i){
-        as.matrix(1, nrow = 1, ncol = 1)
-      }, simplify = FALSE)
-      phi <- sapply(phi, function(i){
-        i[,1,drop=F]
-      }, simplify = FALSE)
+    if (model == -1){
+      xs <- sapply(row.names(design), function(i) {
+        kronecker(diag(num.knot + 4), 1)
+      }, simplify = F)
     } else if (model == 1) {
       xs <- sapply(row.names(design), function(i) {
-        kronecker(diag(num.knot + 4), design[i, 1, drop = F])
+        kronecker(diag(num.knot + 4), design[i,-testvar])
       }, simplify = F)
     } else if (model == 2) {
-      # xs <- sapply(row.names(design), function(i) {
-      #   tmp <- kronecker(diag(num.knot + 4), design[i, ])
-      #   tmp <- tmp[-seq(4, nrow(tmp), 2), ]
-      # }, simplify = F)
       xs <- sapply(row.names(design), function(i) {  ## change X
-        tmp <- kronecker(diag(num.knot + 4), c(1,1))
-        tmp <- tmp[-seq(4, nrow(tmp), 2), ]
-        tmp[1,] <- design[i,2]
-        tmp
+        rbind(design[i,testvar],kronecker(diag(num.knot + 4), design[i,-testvar]))
       }, simplify = F)
     } else if (model == 3) {
       xs <- sapply(row.names(design), function(i) {
@@ -152,18 +181,19 @@ fitpt <- function(expr,
     
     ## initialize
     B1 <- Reduce('+',phiXTphiX)
-    B2 <- Reduce('+',sapply(as,function(s) sexpr[, cellanno[,2]==s, drop=F] %*% phiX[[s]],simplify = F))
-    B <- B2 %*% solve(B1)
-    
-    indfit <- sapply(as,function(s) {
-      sexpr[, cellanno[,2]==s, drop=F] %*% (phi[[s]] %*% chol2inv(chol(crossprod(phi[[s]]))))
-    },simplify = F)
-    
-    s2 <- matrix(sapply(as,function(s) {
-      tmp <- sexpr[, cellanno[,2]==s, drop=F]-indfit[[s]] %*% t(phi[[s]])
+    B2 <- indfit <- s2 <- list()
+    for (s in as) {
+      sexpr <- exprreadfunc(s,match(gid,gn))
+      B2[[s]] <- sexpr %*% phiX[[s]]
+      indfit[[s]] <- sexpr %*% (phi[[s]] %*% chol2inv(chol(crossprod(phi[[s]]))))
+      tmp <- sexpr-indfit[[s]] %*% t(phi[[s]])
       n <- ncol(tmp)
-      (rowMeans(tmp*tmp)-(rowMeans(tmp))^2)*(n)/(n-1)
-    }),nrow=length(gid),dimnames=list(gid,as))
+      s2[[s]] <- (rowMeans(tmp*tmp)-(rowMeans(tmp))^2)*(n)/(n-1)
+    }
+    B2 <- Reduce('+',B2)
+    s2 <- do.call(cbind,s2)
+    
+    B <- B2 %*% solve(B1)
     alpha <- 1/apply(s2,1,var)*rowMeans(s2)^2+2
     eta <- (alpha-1)*rowMeans(s2)
     
@@ -176,14 +206,12 @@ fitpt <- function(expr,
     },simplify = F))
     omega <- omega/length(as)
     for (g in 1:nrow(omega))
-      #if (!is.positive.definite(matrix(omega[g,],nrow=nb)))
-      omega[g,] <- as.vector(diag(pmax(1e-5,diag(matrix(omega[g,],nrow=nb)))))
-    
-    
+  #    if (!is.positive.definite(matrix(omega[g,],nrow=nb))) 
+        omega[g,] <- as.vector(diag(pmax(1e-5,diag(matrix(omega[g,],nrow=nb)))))
+
     iter <- 0
-    gidr <- rownames(sexpr)
+    gidr <- gid
     oldpara <- list(beta = B, alpha = alpha, eta = eta, omega = omega)
-    #etalist <- alphalist <- omegalist <- Nlist <- Jslist <- list()
     while (iter < EMmaxiter && length(gidr) > 0) {
       
       oinv <- sapply(gidr,function(g) {
@@ -192,7 +220,8 @@ fitpt <- function(expr,
       
       flag <- 0
       for (s in as) {
-        sexpr_phibx <- sexpr[gidr, cellanno[,2]==s, drop=F]-B[gidr,] %*% t(phiX[[s]])
+        sexpr <- exprreadfunc(s,match(gidr,gn))
+        sexpr_phibx <- sexpr - B[gidr,] %*% t(phiX[[s]])
         
         L <- rowSums(sexpr_phibx * sexpr_phibx)
         
@@ -215,13 +244,13 @@ fitpt <- function(expr,
         if (flag==0) {
           B1 <- tcrossprod(N,as.vector(phiXTphiX[[s]]))
           rownames(B1) <- gidr
-          B2 <- N * ((sexpr[ gidr,cellanno[,2]==s, drop=F] - t(phi[[s]] %*% t(JK))) %*% phiX[[s]])
+          B2 <- N * ((sexpr - t(phi[[s]] %*% t(JK))) %*% phiX[[s]])
           omegalist <- t(Jsolve) + N*JK[,rep(1:nb,nb)] * JK[,rep(1:nb,each=nb)]
           sumA <- A
           sumN <- N
         } else {
           B1 <- B1 + tcrossprod(N,as.vector(phiXTphiX[[s]]))
-          B2 <- B2 + N * ((sexpr[ gidr,cellanno[,2]==s, drop=F] - t(phi[[s]] %*% t(JK))) %*% phiX[[s]])
+          B2 <- B2 + N * ((sexpr - t(phi[[s]] %*% t(JK))) %*% phiX[[s]])
           omegalist <- omegalist + t(Jsolve) + N*JK[,rep(1:nb,nb)] * JK[,rep(1:nb,each=nb)]
           sumA <- sumA + A
           sumN <- sumN + N
@@ -254,14 +283,12 @@ fitpt <- function(expr,
           rowSums(abs(para[[s]]-oldpara[[s]]))/rowSums(abs(oldpara[[s]]))  
         }
       })
-      if (is.vector(paradiff)) paradiff <- matrix(paradiff,nrow=1,dimnames=list(gid,NULL))
+      if (is.vector(paradiff)) paradiff <- matrix(paradiff,nrow=1,dimnames=list(gid,NULL))    
       paradiff <- apply(paradiff,1,max)
       gidr <- names(which(paradiff > EMitercutoff))
       oldpara <- para
       iter <- iter + 1
-      rm(list = c('L','Jsolve', 'K'))
     }
-    
     oinv <- sapply(gid,function(g) {
       chol2inv(chol(matrix(omega[g,],nrow=nb)))
     },simplify = F)
@@ -269,7 +296,7 @@ fitpt <- function(expr,
       log(det(matrix(omega[g,],nrow=nb)))/2
     })
     ll <- rowSums(matrix(sapply(as,function(s) {
-      sexpr_phibx <- sexpr[gid, cellanno[,2]==s, drop=F]-B[gid,] %*% t(phiX[[s]])
+      sexpr_phibx <- exprreadfunc(s,match(gid,gn))-B[gid,] %*% t(phiX[[s]])
       L <- rowSums(sexpr_phibx * sexpr_phibx)
       K <- tcrossprod(t(phi[[s]]),sexpr_phibx)
       Jchol <- sapply(gid,function(g) {
@@ -282,9 +309,7 @@ fitpt <- function(expr,
       logdv <- -2*colSums(log(sapply(Jchol,as.vector)[seq(1,nb*nb,nb+1),,drop=F]))
       alpha[gid]*log(2*eta[gid])+lgamma(cn[s]/2+alpha[gid])-cn[s]*log(pi)/2-lgamma(alpha[gid])-omegadet+logdv/2-(cn[s]/2+alpha[gid])*log(L2eKJK)
     }),nrow=length(gid),dimnames=list(gid,NULL)))
-    
-    # print(table(apply(all,1,function(i) mean(diff(i) >= 0))))  
-    return(list(beta = B, alpha = alpha, eta = eta, omega = omega, ll = ll))
+    return(list(beta = B, alpha = alpha, eta = eta, omega = omega,ll=ll))
   }
   
   if (ncores!=1) {
@@ -303,7 +328,8 @@ fitpt <- function(expr,
                         ll=unname(allres[[i]][[5]][j]))
     }
   }
-  list(parameter=para[rownames(expr)],knotnum=knotnum[rownames(expr)])
+  list(parameter=para[targetgene],knotnum=knotnum[targetgene])
 }
+
 
 

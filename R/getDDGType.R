@@ -3,18 +3,17 @@
 #' This function is used to obtain the DDG types for the DDG in sample covariate test.
 #'
 #' @author Wenpin Hou <whou10@jhu.edu>
-#' @return a vector of DDGType. The names of this vector are the DDG.
+#' @return a vector of XDE Types, including meanSig, trendSig, bothSig, other, and nonXDE. The names of this vector are the XDE genes.
 #' @export
 #' @param testobj output object of the function tespt().
 #' @param cutoff the FDR cutoff to select "statistically significant" genes.
 #' @examples
 #' data(mantestobj)
-#' a = getDDGType(mantestobj)
+#' a = getXDEType(mantestobj)
 
-getDDGType <- function(testobj, cutoff = 0.05) {
+getXDEType <- function(testobj, cutoff = 0.05) {
   res <- testobj$statistics
-  if (testobj$test.type == 'Variable' |
-      testobj$test.type == 'variable') {
+  if (toupper(testobj$test.type) == 'VARIABLE') {
     diffType <- sapply(rownames(res), function(g) {
       if (res[g, grep('^fdr.*overall$', colnames(res))] < cutoff) {
         if (res[g, grep('^fdr.*meanDiff$', colnames(res))] < cutoff &
@@ -30,12 +29,11 @@ getDDGType <- function(testobj, cutoff = 0.05) {
           'other'
         }
       } else {
-        'nonDDG'
+        'nonXDE'
       }
     })
-  } else if (testobj$test.type == 'Time' |
-             testobj$test.type == 'time') {
-    print('ConstantTimeTest does not lead to DDGType!')
+  } else if (toupper(testobj$test.type) == 'TIME') {
+    print('ConstantTimeTest does not lead to XDEType!')
   }
   return(diffType)
 }

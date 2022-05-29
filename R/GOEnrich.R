@@ -3,14 +3,13 @@
 #' This function is used to obtain enrich Gene Ontology (GO) terms (currently only for human genes)
 #'
 #' @import  topGO org.Hs.eg.db igraph grid
-#' @importFrom stats cov2cor
 #' @importFrom topGO graph
 #' @importFrom topGO algorithm
 #' @importFrom topGO depth
 #' @export
 #' @return a list. Each element is a data frame about the GO terms and their statistics.
 #' @author Wenpin Hou <whou10@jhu.edu>
-#' @param testobj output object of lamian.test()
+#' @param testobj output object of lamian_test()
 #' @param fdr.cutoff FDR cutoff to select "statistically significant" GO terms.
 #' @param k number of clusters to be used for clustering, if the gene clustering results have not yet been included in testobj.
 #' @param use.clusters If TRUE (default), use the clusters in testobj.

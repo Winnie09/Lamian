@@ -25,7 +25,6 @@
 #' data(hca_bm_cellanno)
 #' res = infer_tree_structure(pca = hca_bm_pca, expression = hca_bm_saver, cellanno = hca_bm_cellanno, origin.marker = c('CD34'), xlab='Principal component 1', ylab = 'Principal component 2')
 
-
 infer_tree_structure <-
   function(pca,
            cellanno,

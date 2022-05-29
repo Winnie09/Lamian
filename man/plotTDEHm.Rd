@@ -19,7 +19,7 @@ plotTDEHm(
 )
 }
 \arguments{
-\item{testobj}{output object from lamian.test(). It is a list.}
+\item{testobj}{output object from lamian_test(). It is a list.}
 
 \item{showRowName}{logical. If FALSE (default), row names (i.e. gene names) of the heatmaps will not be shown in the plot.}
 
