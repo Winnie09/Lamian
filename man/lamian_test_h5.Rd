@@ -52,7 +52,7 @@ lamian_test_h5(
 
 \item{test.method}{One of c('chisq', 'permutation). If 'permutation' (default), use the permutation test to identify genes. If 'chisq', use the chisq test to identify genes.}
 
-\item{ncores.fit}{is the ncores for fitpt() or fitfunc()(essentially fitpt()) only. It only works when test.method = 'chisq'.}
+\item{ncores.fit}{is the ncores for fitpt_h5() or fitfunc_h5()(essentially fitpt_h5()) only. It only works when test.method = 'chisq'.}
 
 \item{fix.all.zero}{logical. If TRUE (defalt), fix the issue of all zeros in any samples.}
 
@@ -67,7 +67,8 @@ a list of results
 This function is designed for doing different tests when the input gene expression is in hdf5 format.
 }
 \examples{
-data(mandata)
+data(expdata)
+res <- lamian_test_h5(expr='data/multi.h5', cellanno=expdata$cellanno, pseudotime=expdata$pseudotime, design=expdata$design, testvar=2, test.type = 'Variable', overall.only = F, test.method = 'chisq')
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

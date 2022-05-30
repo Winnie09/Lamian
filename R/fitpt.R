@@ -21,17 +21,7 @@
 #' @examples
 #' data(mandata)
 #' a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
-fitpt <- function(expr, 
-                  cellanno, 
-                  pseudotime, 
-                  design, 
-                  maxknotallowed=10, 
-                  EMmaxiter=100, 
-                  EMitercutoff=0.05, 
-                  verbose=F, 
-                  ncores=1, 
-                  model = 3, 
-                  knotnum = NULL) {
+fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=100, EMitercutoff=0.05, verbose=F, ncores=1, model = 3, knotnum = NULL) {
   pseudotime <- pseudotime[colnames(expr)]
   cellanno <- cellanno[match(colnames(expr),cellanno[,1]),]
   sname <- sapply(row.names(design),function(i) cellanno[cellanno[,2]==i,1],simplify = F)
@@ -100,34 +90,26 @@ fitpt <- function(expr,
   }
   
   sfit <- function(num.knot) {
+    #print(paste0('num.knot = ', num.knot))
     gid <- names(which(knotnum==num.knot))
-    sexpr <- expr[gid,,drop=F] ## 
+    #print(gid)
+    sexpr <- expr[gid,,drop=F] ## !!! double check, should be list len =S
     phi <- philist[[as.character(num.knot)]]
     phicrossprod <- apply(phi,1,tcrossprod)
     phicrossprod <- sapply(names(sname),function(ss) phicrossprod[,sname[[ss]]],simplify = F)
     phi <- sapply(names(sname),function(ss) phi[sname[[ss]],],simplify = F)
     
-    if (model == 0){
-      xs <- sapply(row.names(design), function(i){
-        as.matrix(1, nrow = 1, ncol = 1)
-      }, simplify = FALSE)
-      phi <- sapply(phi, function(i){
-        i[,1,drop=F]
-      }, simplify = FALSE)
+    if (model == -1){
+      xs <- sapply(row.names(design), function(i) {
+        kronecker(diag(num.knot + 4), 1)
+      }, simplify = F)
     } else if (model == 1) {
       xs <- sapply(row.names(design), function(i) {
-        kronecker(diag(num.knot + 4), design[i, 1, drop = F])
+        kronecker(diag(num.knot + 4), design[i,-testvar])
       }, simplify = F)
     } else if (model == 2) {
-      # xs <- sapply(row.names(design), function(i) {
-      #   tmp <- kronecker(diag(num.knot + 4), design[i, ])
-      #   tmp <- tmp[-seq(4, nrow(tmp), 2), ]
-      # }, simplify = F)
       xs <- sapply(row.names(design), function(i) {  ## change X
-        tmp <- kronecker(diag(num.knot + 4), c(1,1))
-        tmp <- tmp[-seq(4, nrow(tmp), 2), ]
-        tmp[1,] <- design[i,2]
-        tmp
+        rbind(design[i,testvar],kronecker(diag(num.knot + 4), design[i,-testvar]))
       }, simplify = F)
     } else if (model == 3) {
       xs <- sapply(row.names(design), function(i) {
@@ -305,5 +287,6 @@ fitpt <- function(expr,
   }
   list(parameter=para[rownames(expr)],knotnum=knotnum[rownames(expr)])
 }
+
 
 

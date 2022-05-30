@@ -5,7 +5,6 @@
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer reshape2
-#' @importFrom grDevices colorRampPalette
 #' @export
 #' @param testobj output object from lamian_test(). It is a list.
 #' @param gene a vector of gene names.
@@ -74,7 +73,7 @@ plotClusterDiff <- function(testobj,
       p <- p + scale_color_brewer(palette = 'Dark2')
     } else {
       p <-
-        p + scale_color_manual(values = colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$cluster))))
+        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$cluster))))
     }
   }
   if (axis.text.blank) {

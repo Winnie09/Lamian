@@ -4,8 +4,7 @@
 #'
 #' @return A ggplot2 plot
 #' @export
-#' @import stats matrixcalc ggplot2 plyr grid igraph
-#' @importFrom grDevices colorRampPalette
+#' @import stats matrixcalc ggplot2 plyr grid igraph grDevices
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @param x indicates which column in the low-dimrension representation to be used as x-axis coordinates.
 #' @param y indicates which column in the low-dimrension representation to be used as y-axis coordinates.

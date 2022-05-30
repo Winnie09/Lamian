@@ -15,7 +15,6 @@
 #' @param axis.text.blank logical. If TRUE, leave axis text as blank.
 #' @export
 #' @import ggplot2 RColorBrewer
-#' @importFrom grDevices colorRampPalette
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @examples
@@ -142,7 +141,7 @@ plotGenePopulation <- function(testobj,
       p <-  p + scale_color_brewer(palette = palette)
     } else {
       p <-
-        p + scale_color_manual(values = colorRampPalette(brewer.pal(8, palette))(length(unique(pd$type))))
+        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(8, palette))(length(unique(pd$type))))
     }
   }
   

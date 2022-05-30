@@ -35,7 +35,6 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
   ## testvar: a numeric value, indicating which column in the design should be tested on. 
   if (test.method == 'permutation') ncores.fit = 1
   set.seed(12345)
-  library(splines)
   cellanno = data.frame(Cell = as.character(cellanno[,1]), Sample = as.character(cellanno[,2]), stringsAsFactors = FALSE)
   expr <- expr[, names(pseudotime), drop = FALSE]
   cellanno <- cellanno[match(names(pseudotime), cellanno[,1]), ]
@@ -103,7 +102,8 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
   } else if (test.method == 'permutation'){
     print('fitting model: overall: CovariateTest (Model 3 vs.1) or ConstantTest (Model 1) ...')
     if (ncores == 1){
-       fit <- lapply(seq_len(permuiter+1),function(i) fitfunc(iter = i, diffType = 'overall', test.type = test.type,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design))} else {
+       fit <- lapply(seq_len(permuiter+1),function(i) fitfunc(iter = i, diffType = 'overall', test.type = test.type, testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design))
+       } else {
         fit <- mclapply(seq_len(permuiter+1),function(i){set.seed(i); fitfunc(iter = i, diffType = 'overall', test.type = test.type, testvar=testvar,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose,  expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design)}, mc.cores = ncores)
       }
     print('The length of fit is ...')  ##

@@ -45,7 +45,7 @@ cellPropTest <- function(cellanno,
       stringsAsFactors = F
     )
   res <-
-    testpt(
+    lamian_test(
       expr = ptexpr,
       cellanno = ptcellanno,
       pseudotime = ptpt,
@@ -53,7 +53,6 @@ cellPropTest <- function(cellanno,
       testvar = testvar,
       ncores = ncores,
       test.type = test.type,
-      demean = FALSE,
       test.method = 'permutation',
       ncores.fit = 1,
       fix.all.zero = F

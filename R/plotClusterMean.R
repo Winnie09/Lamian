@@ -4,7 +4,6 @@
 #'
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @import ggplot2 RColorBrewer gridExtra viridis reshape2
-#' @importFrom grDevices colorRampPalette
 #' @export
 #' @return a plot
 #' @param testobj output object from lamian.test(). It is a list.
@@ -53,7 +52,7 @@ plotClusterMean <- function(testobj,
       p <- p + scale_color_brewer(palette = 'Dark2')
     } else {
       p <-
-        p + scale_color_manual(values = colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$type))))
+        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$type))))
     }
   } else if (type == 'time') {
     int <- intersect(rownames(fit), names(cluster))
@@ -87,7 +86,7 @@ plotClusterMean <- function(testobj,
       p <- p + scale_color_brewer(palette = 'Set1')
     } else {
       p <-
-        p + scale_color_manual(values = colorRampPalette(brewer.pal(9, 'Set1'))(length(unique(pd$cluster))))
+        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(9, 'Set1'))(length(unique(pd$cluster))))
     }
   }
   

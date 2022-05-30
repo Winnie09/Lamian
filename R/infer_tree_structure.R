@@ -5,10 +5,9 @@
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @return a list
 #' @export
-#' @import TSCAN scattermore RColorBrewer
+#' @import TSCAN scattermore RColorBrewer grDevices
 #' @importFrom grDevices pdf
 #' @importFrom grDevices dev.off
-#' @importFrom grDevices colorRampPalette
 #' @param  pca cell by principal component (pc) matrix. Principal components reduction of the cells.
 #' @param cellanno 2-column or 3-column dataframe/matrix, first column is cell name, second column is sample, third column (if exists) is cell type.
 #' @param expression only useful when users want to use highly expressed marker genes to determine the starting point of pseudotime. It is a gene by cell expression matrix. The values should be library-size-normalized and log-transformed expression values. They can either be imputed or non-imputed.

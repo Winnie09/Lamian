@@ -10,8 +10,7 @@
 #' @param gene a vector of gene names. It is used when users want to externally specify the genes (or specify the order or genes).
 #' @param testvar a numeric number indicating the column in the design matrix that needs to be tested while controlling for other columns (not intercept). Its value when calls the function will be used. e.g. testvar = 2 means the second column in the design needs to be tested.
 #' @param test.type the type of test. One of c('Time', 'Variable). Case insensitive. 
-#' @param testvar a numeric number indicating the column in the design matrix that needs to be tested while controlling for other columns (not intercept). Default is 2. testvar = 2 means the second column in the design needs to be tested.
-#' @param expr gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.
+#' @param expr hdf5 file path (including file name). This hdf5 file is the gene expression. 
 #' @param cellanno a dataframe where the first column are cell names and second column are sample names.
 #' @param pseudotime a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.
 #' @param design: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.
@@ -19,14 +18,12 @@
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
 #' @param verbose logical. If TRUE, print intermediate information.
 #' @param ncores the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.
-
-fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type = 'Time', testvar=testvar, EMmaxiter=100, EMitercutoff=0.05, verbose=F, ncores=1, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design) {
-  expr <- expr[gene, ,drop=FALSE]
+fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testvar, test.type = 'Time', expr = expr, cellanno = cellanno, pseudotime = pseudotime, design = design, EMmaxiter = 100, EMitercutoff = 0.05, verbose = F, ncores = 1) {
   print(paste0('iter ', iter, '\n'))
   if (toupper(test.type)=='TIME') {
-    if (iter == 1){
-      fitres.full <- fitpt(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], testvar=testvar,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model=-1)
-      fitres.null <- fitpt.m0(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
+    if (iter == 1) {
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],testvar=testvar,targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model=-1)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
       return(list(fitres.full = fitres.full, fitres.null = fitres.null))
     } else {
       perpsn <- lapply(rownames(design), function(s){
@@ -37,16 +34,16 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       })
       names(perpsn) <- NULL
       perpsn <- unlist(perpsn)
-      perpsn <- perpsn[names(pseudotime)]
       sampcell <- as.vector(unlist(lapply(unique(cellanno[,2]), function(p){
         sample(which(cellanno[,2] == p), replace = T)
       }))) ### bootstrap
-      perexpr <- expr[,sampcell,drop=F]
       percellanno <- cellanno[sampcell,,drop=F]
+      perpsn <- perpsn[names(pseudotime)]
       perpsn <- perpsn[sampcell]
-      colnames(perexpr) <- percellanno[,1] <- names(perpsn) <- paste0('cell_',1:length(perpsn))
-      tryCatch(fitres.full <- fitpt(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = -1), warning = function(w){}, error = function(e) {})
-      tryCatch(fitres.null <- fitpt.m0(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose), warning = function(w){}, error = function(e) {})
+      boot <- data.frame(percellanno[,1],paste0('cell_',1:length(perpsn)),stringsAsFactors = F) #### rename cells
+      percellanno[,1] <- names(perpsn) <- paste0('cell_',1:length(perpsn)) ## save the original cell name and permuted cell names relation, not used here actually, because hdf5 file already save the cells for each sample seperately
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = -1,testvar=testvar)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
       if (exists('fitres.full') & exists('fitres.null')) {
         print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
@@ -68,43 +65,50 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.full)
-      fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
+      fitres.full <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.full,testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
         print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
+      } else if (!exists('fitres.full')){
+        print(paste0('iter ', iter, 'full model failed. Skip ...'))
+        return(NULL)
       } else {
-        print(paste0('iter ', iter, ' try again!'))
+        print(paste0('iter ', iter, 'null model failed. Skip ...'))
         return(NULL)
       }
     } else {
-      dn <- paste0(design[,testvar],collapse = '_')
+      dn <- paste0(as.vector(design),collapse = '_')
       perdn <- dn
       while(perdn==dn) {
         perid <- sample(1:nrow(design))
-        perdesign <- design
-        perdesign[,testvar] <- design[perid,testvar]
-        perdn <- paste0(perdesign[,testvar],collapse = '_')  
+        perdesign <- design[perid,,drop=F]
+        perdn <- paste0(as.vector(perdesign),collapse = '_')  
       }
       row.names(perdesign) <- row.names(design)
-      sampcell <- sample(1:ncol(expr),replace=T) ## boostrap cells
-      perexpr <- expr[,sampcell,drop=F]
+      sampcell <- sample(1:length(pseudotime),replace=T) ## boostrap cells
       percellanno <- cellanno[sampcell,,drop=F]
       psn <- pseudotime
       psn <- psn[sampcell]
-      colnames(perexpr) <- percellanno[,1] <- names(psn) <- paste0('cell_',1:length(psn))
+      boot <- data.frame(percellanno[,1],paste0('cell_',1:length(psn)),stringsAsFactors = F)
+      percellanno[,1] <- names(psn) <- paste0('cell_',1:length(psn))
       
       
-      fitres.full <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.full)
-      fitres.null <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]])
+      fitres.full <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.full,testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
         print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
+      } else if (!exists('fitres.full')){
+        print(paste0('iter ', iter, 'full model failed. Skip ...'))
+        return(NULL)
       } else {
-        print(paste0('iter ', iter, ' try again!'))
+        print(paste0('iter ', iter, 'null model failed. Skip ...'))
         return(NULL)
       }
     }
   }
 }
+
+
 

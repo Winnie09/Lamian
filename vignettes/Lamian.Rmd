@@ -175,14 +175,16 @@ print(expdata$design)
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
 ### perform XDE test
-We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
 ```{r}
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
                    test.type = 'variable', 
-                   permuiter = 5)
+                   testvar = 2,
+                   permuiter = 5,
+                   ncores = 1)
 ```
 
 ### downstream analysis 1: visualize and cluster XDE genes based on their multiple-sample temporal patterns across sample covariates
@@ -242,7 +244,7 @@ The inputs for Constant Time Test are the same as those for Sample Covariate Tes
 ### perform TDE test
 Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 ```{r}
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
@@ -330,7 +332,8 @@ Res <-
     pseudotime = expdata$pseudotime,
     design = expdata$design,
     ncores = 4,
-    test.type = 'Variable'
+    test.type = 'Variable',
+    testvar = 2
   )
 ```
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.

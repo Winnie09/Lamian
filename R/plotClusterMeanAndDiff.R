@@ -4,8 +4,7 @@
 #'
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
-#' @import ggplot2 RColorBrewer gridExtra reshape2
-#' @importFrom grDevices colorRampPalette
+#' @import ggplot2 RColorBrewer gridExtra reshape2 grDevices
 #' @export
 #' @param testobj output object from lamian_test(). It is a list.
 #' @param cluster users can defined the clusters of the cells. It is a numeric vector whose names are cell names. By default it is retrieved from testobj object.

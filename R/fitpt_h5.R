@@ -22,15 +22,7 @@
 #' @examples
 #' data(mandata)
 #' a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
-
-
-
-
-# test.position = 'all'
-# maxknotallowed=10; EMmaxiter=1000; EMitercutoff=0.01; verbose=F; ncores=1; model = 3
-
-# expr: 
-fitpt <- function(expr, 
+fitpt_h5 <- function(expr, 
                   pseudotime, 
                   design, 
                   testvar=testvar, 
@@ -43,8 +35,6 @@ fitpt <- function(expr,
                   ncores=1, 
                   model = 3, 
                   knotnum = NULL) {
-  
-  
   samp <- unname(rownames(design))
   sname <- sapply(samp,function(s) as.vector(h5read(expr,paste0(s,'/barcode')))) ## each sample's cells, h5read is to read the expr in one sample
   if (!is.null(boot)) sname <- sapply(sname,function(i) boot[boot[,1] %in% i,2],simplify = F,USE.NAMES = T) ## use new cell names. boot[,1] old names, boot[,2] new (permuted) cell names
@@ -94,7 +84,7 @@ fitpt <- function(expr,
     maxknot <- maxknot + 1
     phi <- philist[[as.character(maxknot)]]
     testpos <- mean(sapply(names(sname), function(ss) {
-      is.positive.definite(crossprod(phi[sname[[ss]],,drop=F]))
+      matrixcalc::is.positive.definite(crossprod(phi[sname[[ss]],,drop=F]))
     })) == 1
   }
   maxknot <- maxknot - 1

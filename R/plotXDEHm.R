@@ -2,7 +2,7 @@
 #'
 #' This function is used for plotting the fitting heatmaps for the XDE test.
 #'
-#' @import ggplot2 RColorBrewer gridExtra viridis ComplexHeatmap grDevices colorRampPalette
+#' @import ggplot2 RColorBrewer gridExtra viridis ComplexHeatmap grDevices
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
