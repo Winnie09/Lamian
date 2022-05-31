@@ -60,10 +60,10 @@ plotTDEHm <-
     fit.bak = fit
     clu <- testobj$cluster
     if (toupper(type) == 'VARIABLE') {
-      if ('DDGType' %in% names(testobj))
-        DDGType <- testobj$DDGType
+      if ('XDEType' %in% names(testobj))
+        XDEType <- testobj$XDEType
       else
-        DDGType <- getDDGType(testobj)
+        XDEType <- getXDEType(testobj)
       fit.scale <- do.call(cbind, fit)
       fit.scale <- fit.scale[names(testobj$cluster),]
       fit.scale <- scalematrix(fit.scale)
@@ -80,10 +80,10 @@ plotTDEHm <-
           v <- fit.scale[i, seq(1, ncol(fit.scale) / 2)]
           which(v[-length(v)] * v[-1] < 0)[1]
         }),
-        DDGType = DDGType[names(clu)]
+        XDEType = XDEType[names(clu)]
       )
       res <-
-        res[order(res$clu, res$DDGType, res$changepoint, res$cor),]
+        res[order(res$clu, res$XDEType, res$changepoint, res$cor),]
     } else {
       fit.scale <- scalematrix(fit)
       dimnames(fit.scale) <- dimnames(fit)
@@ -167,7 +167,7 @@ plotTDEHm <-
       if (toupper(type) == 'VARIABLE') {
         rowann = data.frame(
           cluster = as.character(clu),
-          DDGType = as.character(DDGType[names(clu)]),
+          XDEType = as.character(XDEType[names(clu)]),
           stringsAsFactors = FALSE
         )
       } else if (toupper(type) == 'TIME') {
@@ -186,14 +186,14 @@ plotTDEHm <-
     
     if (is.null(colann) | is.null(annotation_colors)) {
       if (toupper(type) == 'VARIABLE') {
-        col.DDGType = brewer.pal(8, 'Dark2')[seq_len(length(unique(res$DDGType)))]
-        names(col.DDGType) = unique(res$DDGType)
+        col.XDEType = brewer.pal(8, 'Dark2')[seq_len(length(unique(res$XDEType)))]
+        names(col.XDEType) = unique(res$XDEType)
         annotation_colors = list(
           pseudotime = col.pseudotime,
           group = col.group,
           expression = col.expression,
           cluster = col.clu,
-          DDGType = col.DDGType
+          XDEType = col.XDEType
         )
       } else if (toupper(type) == 'TIME') {
         annotation_colors = list(pseudotime = col.pseudotime,
