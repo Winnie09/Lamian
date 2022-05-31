@@ -25,21 +25,21 @@ clusterGene <- function(testobj, gene, type = 'variable', k.auto = FALSE, k=5, m
                         type = type,
                         method = method)
   } else if (toupper(type) == 'VARIABLE'){
-    if ('DDGType' %in% names(testobj)){
-      DDGType <- testobj$DDGType
+    if ('XDEType' %in% names(testobj)){
+      XDEType <- testobj$XDEType
     } else {
-      DDGType <- getDDGType(testobj)
+      XDEType <- getXDEType(testobj)
     }
     
-    clu <- cluster_gene(testobj, gene = names(DDGType)[!DDGType %in% c('nonDDG', 'meanSig')], type = 'variable', k=k, scale.difference = scale.difference, method = method, k.auto = k.auto)
+    clu <- cluster_gene(testobj, gene = names(XDEType)[!XDEType %in% c('nonXDE', 'meanSig')], type = 'variable', k=k, scale.difference = scale.difference, method = method, k.auto = k.auto)
     design = testobj$design
     cellanno = testobj$cellanno
     meandiff <- sapply(c(0,1), function(i){
       as <- rownames(design[design[,2]==i, ])
       if ('expr' %in% names(testobj)){
-        rowMeans(testobj$expr[names(DDGType)[DDGType == 'meanSig'], cellanno[cellanno[,2] %in% as,1], drop = FALSE])
+        rowMeans(testobj$expr[names(XDEType)[XDEType == 'meanSig'], cellanno[cellanno[,2] %in% as,1], drop = FALSE])
       } else {
-        rowMeans(testobj$expr.ori[names(DDGType)[DDGType == 'meanSig'], cellanno[cellanno[,2] %in% as,1], drop = FALSE])
+        rowMeans(testobj$expr.ori[names(XDEType)[XDEType == 'meanSig'], cellanno[cellanno[,2] %in% as,1], drop = FALSE])
       }
     }, simplify = FALSE)
     meandiff = do.call(cbind, meandiff)
