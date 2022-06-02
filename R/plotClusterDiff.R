@@ -73,7 +73,7 @@ plotClusterDiff <- function(testobj,
       p <- p + scale_color_brewer(palette = 'Dark2')
     } else {
       p <-
-        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$cluster))))
+        p + scale_color_manual(values = grDevices::colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$cluster))))
     }
   }
   if (axis.text.blank) {

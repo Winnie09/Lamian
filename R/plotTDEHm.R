@@ -146,7 +146,7 @@ plotTDEHm <-
           stringsAsFactors = FALSE
         )
         
-        col.group = RColorBrewer::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$group)))
+        col.group = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$group)))
         names(col.group) = unique(colann$group)
       } else if (toupper(type) == 'TIME') {
         colann <- data.frame(
@@ -160,7 +160,7 @@ plotTDEHm <-
     rownames(colann) = colnames(expr.scale)
     col.expression = brewer.pal(n = 8, name = "Pastel1")[seq_len(2)]
     names(col.expression) = c('Original', 'Model Fitted')
-    col.pseudotime = RColorBrewer::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$pseudotime)))
+    col.pseudotime = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann$pseudotime)))
     names(col.pseudotime) = unique(colann$pseudotime)
     
     if (is.null(rowann)) {
@@ -179,7 +179,7 @@ plotTDEHm <-
       if (length(unique(clu)) < 8) {
         col.clu = brewer.pal(8, 'Set1')[seq_len(length(unique(clu)))]
       } else {
-        col.clu = RColorBrewer::colorRampPalette(brewer.pal(8, 'Set1'))[seq_len(length(unique(clu)))]
+        col.clu = grDevices::colorRampPalette(brewer.pal(8, 'Set1'))[seq_len(length(unique(clu)))]
       }
       names(col.clu) = unique(clu)
     }
@@ -203,7 +203,7 @@ plotTDEHm <-
     }
     
     #### save png
-    cpl = RColorBrewer::colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100)
+    cpl = grDevices::colorRampPalette(rev(brewer.pal(n = 7, name = "RdYlBu")))(100)
     plist <- list()
     
     p1 <- pheatmap::pheatmap(
@@ -241,7 +241,7 @@ plotTDEHm <-
           expression = 'Model Fitted',
           stringsAsFactors = FALSE
         )
-      col.pseudotime = RColorBrewer::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime)))
+      col.pseudotime = grDevices::colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime)))
       names(col.pseudotime) = unique(colann.fit$pseudotime)
       annotation_colors$pseudotime <- col.pseudotime
     }

@@ -65,12 +65,14 @@ str(expdata$pseudotime)
 print(expdata$design)
 
 ## -----------------------------------------------------------------------------
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
                    test.type = 'variable', 
-                   permuiter = 5)
+                   testvar = 2,
+                   permuiter = 5,
+                   ncores = 1)
 
 ## -----------------------------------------------------------------------------
 ## get differential dynamic genes statistics 
@@ -91,16 +93,16 @@ Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
 Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
 table(Res$cluster)
 
-## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"----
-colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
-plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
+## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE----
+#  colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
+#  plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 
 ## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE----
 #  ## plotClusterMeanAndDiff
 #  plotClusterMeanAndDiff(Res)
 
 ## -----------------------------------------------------------------------------
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
@@ -121,18 +123,18 @@ Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'time')
 ## -----------------------------------------------------------------------------
 Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
 
-## ----fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"----
-plotTDEHm(
-  Res,
-  subsampleCell  = FALSE,
-  showCluster = TRUE,
-  type = 'time',
-  cellWidthTotal = 200,
-  cellHeightTotal = 200
-)
+## ----fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE----
+#  plotTDEHm(
+#    Res,
+#    subsampleCell  = FALSE,
+#    showCluster = TRUE,
+#    type = 'time',
+#    cellWidthTotal = 200,
+#    cellHeightTotal = 200
+#  )
 
-## ----fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%'----
-plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
+## ----fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE----
+#  plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 
 ## ----eval = FALSE-------------------------------------------------------------
 #  Res <-
@@ -154,7 +156,8 @@ head(Res$statistics)
 #      pseudotime = expdata$pseudotime,
 #      design = expdata$design,
 #      ncores = 4,
-#      test.type = 'Variable'
+#      test.type = 'Variable',
+#      testvar = 2
 #    )
 
 ## -----------------------------------------------------------------------------

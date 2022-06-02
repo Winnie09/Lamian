@@ -1,6 +1,6 @@
-#' Obtain the DDG types for the DDG in sample covariate test.
+#' Obtain the XDE types for the XDE significant genes in sample covariate test.
 #'
-#' This function is used to obtain the DDG types for the DDG in sample covariate test.
+#' This function is used to obtain the XDE types for the XDE genes in sample covariate test.
 #'
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @return a vector of XDE Types, including meanSig, trendSig, bothSig, other, and nonXDE. The names of this vector are the XDE genes.

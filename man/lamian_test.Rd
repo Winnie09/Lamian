@@ -69,7 +69,7 @@ This function is designed for doing different tests.
 }
 \examples{
 data(mandata)
-a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
+a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

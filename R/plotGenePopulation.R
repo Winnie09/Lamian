@@ -141,7 +141,7 @@ plotGenePopulation <- function(testobj,
       p <-  p + scale_color_brewer(palette = palette)
     } else {
       p <-
-        p + scale_color_manual(values = RColorBrewer::colorRampPalette(brewer.pal(8, palette))(length(unique(pd$type))))
+        p + scale_color_manual(values = grDevices::colorRampPalette(brewer.pal(8, palette))(length(unique(pd$type))))
     }
   }
   

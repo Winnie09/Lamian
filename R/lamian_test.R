@@ -25,7 +25,7 @@
 #' @param cutoff a numeric number to set the cutoff for the standard deviation of gene expression in any one of the samples. Only useful when fix.all.zero == TRUE.
 #' @examples
 #' data(mandata)
-#' a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
+#' a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
 
 
 lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, permuiter=100, EMmaxiter=100, EMitercutoff=0.05, verbose=F, ncores=detectCores(), test.type='Time', fit.resolution = 1000, return.all.data = TRUE, overall.only = F, test.method = 'permutation', ncores.fit = 1, fix.all.zero = TRUE, cutoff = 1e-5, sd.adjust = 1) { 

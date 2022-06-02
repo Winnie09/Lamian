@@ -201,14 +201,14 @@ str(diffgene)
 ```
 
 
-We will get the population-level estimates for all the DDG by applying function `getPopulationFit()`.
+We will get the population-level estimates for all the XDE genes by applying function `getPopulationFit()`.
 ```{r}
 ## population fit
 Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'variable')
 ```
 
 
-We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig DDG, and the other two clusters for DDG of other types.
+We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig XDE genes, and the other two clusters for XDE genes of other types.
 ```{r}
 ## clustering
 Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
@@ -218,7 +218,7 @@ table(Res$cluster)
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
-```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"}
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE}
 colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
 plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 ```
@@ -231,7 +231,7 @@ plotClusterMeanAndDiff(Res)
 We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
 
 ### downstream analysis 2: Gene ontology (GO) enrichment analysis
-We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
+We can further check out whether the XDE genes in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
 Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. 
 In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`. 
 
@@ -278,7 +278,7 @@ Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
 ```
 
 We can visualize the temporal patterns and compare original and fitted expression
-```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"}
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE}
 plotTDEHm(
   Res,
   subsampleCell  = FALSE,
@@ -290,7 +290,7 @@ plotTDEHm(
 ```
 
 To plot cluster mean patterns.
-```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%'}
+```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE}
 plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 ```
 

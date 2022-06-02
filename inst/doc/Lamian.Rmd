@@ -175,14 +175,16 @@ print(expdata$design)
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
 ### perform XDE test
-We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
 ```{r}
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
                    test.type = 'variable', 
-                   permuiter = 5)
+                   testvar = 2,
+                   permuiter = 5,
+                   ncores = 1)
 ```
 
 ### downstream analysis 1: visualize and cluster XDE genes based on their multiple-sample temporal patterns across sample covariates
@@ -199,14 +201,14 @@ str(diffgene)
 ```
 
 
-We will get the population-level estimates for all the DDG by applying function `getPopulationFit()`.
+We will get the population-level estimates for all the XDE genes by applying function `getPopulationFit()`.
 ```{r}
 ## population fit
 Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'variable')
 ```
 
 
-We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig DDG, and the other two clusters for DDG of other types.
+We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig XDE genes, and the other two clusters for XDE genes of other types.
 ```{r}
 ## clustering
 Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
@@ -216,7 +218,7 @@ table(Res$cluster)
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
-```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center"}
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE}
 colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
 plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
 ```
@@ -229,7 +231,7 @@ plotClusterMeanAndDiff(Res)
 We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
 
 ### downstream analysis 2: Gene ontology (GO) enrichment analysis
-We can further check out whether the DDG in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
+We can further check out whether the XDE genes in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
 Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. 
 In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`. 
 
@@ -242,7 +244,7 @@ The inputs for Constant Time Test are the same as those for Sample Covariate Tes
 ### perform TDE test
 Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 ```{r}
-Res <- lamian.test(expr = expdata$expr, 
+Res <- lamian_test(expr = expdata$expr, 
                    cellanno = expdata$cellanno, 
                    pseudotime = expdata$pseudotime, 
                    design = expdata$design, 
@@ -276,7 +278,7 @@ Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
 ```
 
 We can visualize the temporal patterns and compare original and fitted expression
-```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center"}
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE}
 plotTDEHm(
   Res,
   subsampleCell  = FALSE,
@@ -288,7 +290,7 @@ plotTDEHm(
 ```
 
 To plot cluster mean patterns.
-```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%'}
+```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE}
 plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
 ```
 
@@ -330,7 +332,8 @@ Res <-
     pseudotime = expdata$pseudotime,
     design = expdata$design,
     ncores = 4,
-    test.type = 'Variable'
+    test.type = 'Variable',
+    testvar = 2
   )
 ```
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
