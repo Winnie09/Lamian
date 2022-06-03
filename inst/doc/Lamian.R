@@ -65,25 +65,42 @@ str(expdata$pseudotime)
 ## -----------------------------------------------------------------------------
 print(expdata$design)
 
+## ----eval=FALSE---------------------------------------------------------------
+#  saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
+
 ## -----------------------------------------------------------------------------
-Res <- lamian_test(expr = expdata$expr, 
-                   cellanno = expdata$cellanno, 
-                   pseudotime = expdata$pseudotime, 
-                   design = expdata$design, 
-                   test.type = 'variable', 
-                   testvar = 2,
-                   permuiter = 5,
-                   ncores = 1)
+Res <- lamian_test(
+  expr = expdata$expr,
+  cellanno = expdata$cellanno,
+  pseudotime = expdata$pseudotime,
+  design = expdata$design,
+  test.type = 'variable',
+  testvar = 2,
+  permuiter = 5,
+  ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  ncores = 1
+)
+
+## ----eval=FALSE---------------------------------------------------------------
+#  Res <- lamian_test_h5(
+#    expr = 'data/multi.h5',
+#    cellanno = expdata$cellanno,
+#    pseudotime = expdata$pseudotime,
+#    design = expdata$design,
+#    test.type = 'variable',
+#    testvar = 2,
+#    permuiter = 5,
+#    ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+#    ncores = 1
+#  )
 
 ## -----------------------------------------------------------------------------
 ## get differential dynamic genes statistics
 stat <- Res$statistics
-head(stat)
 stat <- stat[order(stat[, 1],-stat[, 3]),]
 ## identify XDE genes with FDR.overall < 0.05 cutoff
 diffgene <-
   rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05, ])
-str(diffgene)
 
 ## -----------------------------------------------------------------------------
 ## population fit
@@ -96,9 +113,8 @@ Res$covariateGroupDiff <-
   getCovariateGroupDiff(testobj = Res, gene = diffgene)
 Res$cluster <-
   clusterGene(Res, gene = diffgene, type = 'variable', k = 5)
-table(Res$cluster)
 
-## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=TRUE----
+## ----fig_sct_plotDiffFitHm3, fig.height = 5, fig.width = 8, fig.align = "center", eval=TRUE----
 colnames(Res$populationFit[[1]]) <-
   colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
 plotXDEHm(
@@ -109,7 +125,7 @@ plotXDEHm(
   sep = ':.*'
 )
 
-## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = TRUE----
+## ----fig_plotClusterMeanAndDiff, fig.height = 8, fig.width = 3.2, fig.align = "center", eval = TRUE----
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 
@@ -122,14 +138,22 @@ Res <- lamian_test(
   test.type = 'time',
   permuiter = 5
 )
-names(Res)
+
+## ----eval=FALSE---------------------------------------------------------------
+#  Res <- lamian_test_h5(
+#    expr = 'data/multi.h5',
+#    cellanno = expdata$cellanno,
+#    pseudotime = expdata$pseudotime,
+#    design = expdata$design,
+#    test.type = 'time',
+#    permuiter = 5
+#  ) ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
 
 ## -----------------------------------------------------------------------------
 head(Res$statistics)
 
 ## -----------------------------------------------------------------------------
 diffgene <- rownames(Res$statistics)[Res$statistics[, 1] < 0.05]
-str(diffgene)
 
 ## -----------------------------------------------------------------------------
 Res$populationFit <-
@@ -177,9 +201,6 @@ Res <-
     test.type = 'Variable',
     testvar = 2
   )
-
-## -----------------------------------------------------------------------------
-head(Res$statistics)
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

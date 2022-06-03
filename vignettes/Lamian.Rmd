@@ -148,15 +148,15 @@ branchPropTest(data = data, design = design)
 
 ### Data preparation
 
-### Gene expression in matrix form
+### Gene expression in a matrix form
 
-In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any other interesting dataset. 
+In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any dataset of interest. 
 
 ```{r}
 data(expdata)
 ```
 
-The inputs should contain: (a) **expr**: a gene by cell expression matrix. Values are library-size-normalized log-transformed gene expression matrix. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out. 
+The inputs should contain: (a) **expr**: a gene by cell expression matrix. The entires are library-size-normalized log-transformed gene expression values. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out. 
 ```{r}
 str(expdata$expr)
 ```
@@ -171,7 +171,7 @@ head(expdata$cellanno)
 str(expdata$pseudotime)
 ```
 
-(d) **design**: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples. 
+(d) **design**: a matrix or a data frame. The number of rows equals to the number of unique samples. Rownames are sample names. The number of columns depends on the number of sample covariates. The first column is the intercept (all 1s). The second column is the realization values of the first sample-level covariate (e.g. sample groups). Other columns are the realization values for other sample-level covariates. 
 ```{r}
 print(expdata$design)
 ```
@@ -179,14 +179,12 @@ print(expdata$design)
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
 
-
 ### Gene expression in hdf5 format (for ultra-large datasets)
 
-For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed with a faster speed. 
-
+For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed at a faster speed. 
 
 To save the gene expression in hdf5 file format, we apply the following codes which creates a new file **data/multi.h5** (file *multi.h5* in the folder *data/* )
-```{r}
+```{r eval=FALSE}
 saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
 ```
 
@@ -194,7 +192,7 @@ saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$
 ### Perform XDE test
 We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**.  
 
-By default, **test.method = 'permutation'**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  We also provide **test.method = 'chisq'**. 
+By default, **test.method = 'permutation'**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to save the running time. We recommend setting **permuiter = 100** or higher in real applications.  We also provide **test.method = 'chisq'**. 
 
 Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
 
@@ -235,12 +233,10 @@ We will know which are XDE from the **statistics** data frame in the result obje
 ```{r}
 ## get differential dynamic genes statistics
 stat <- Res$statistics
-head(stat)
 stat <- stat[order(stat[, 1],-stat[, 3]),]
 ## identify XDE genes with FDR.overall < 0.05 cutoff
 diffgene <-
   rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05, ])
-str(diffgene)
 ```
 
 
@@ -259,12 +255,11 @@ Res$covariateGroupDiff <-
   getCovariateGroupDiff(testobj = Res, gene = diffgene)
 Res$cluster <-
   clusterGene(Res, gene = diffgene, type = 'variable', k = 5)
-table(Res$cluster)
 ```
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
-```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=TRUE}
+```{r fig_sct_plotDiffFitHm3, fig.height = 5, fig.width = 8, fig.align = "center", eval=TRUE}
 colnames(Res$populationFit[[1]]) <-
   colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
 plotXDEHm(
@@ -277,7 +272,7 @@ plotXDEHm(
 ```
 
 We can plot the cluster mean and difference.
-```{r fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 4, fig.align = "center", eval = TRUE}
+```{r fig_plotClusterMeanAndDiff, fig.height = 8, fig.width = 3.2, fig.align = "center", eval = TRUE}
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 ```
@@ -295,7 +290,7 @@ In practice, if there are significant GO terms in the clusters, we can generate 
 The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
 
 ### Perform TDE test
-Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
+Similar to the **XDE test**, we can perform the *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to save the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 
 If the gene expression is in a matrix format,
 ```{r}
@@ -307,7 +302,6 @@ Res <- lamian_test(
   test.type = 'time',
   permuiter = 5
 )
-names(Res)
 ```
 
 If the gene expression is in an hdf5 file format,
@@ -333,7 +327,6 @@ head(Res$statistics)
 We can further determine the TDE genes as the genes with **fdr.overall** $< 0.05$.
 ```{r}
 diffgene <- rownames(Res$statistics)[Res$statistics[, 1] < 0.05]
-str(diffgene)
 ```
 
 We can estimate the population-level model-fitted patterns for all TDE genes.
@@ -410,9 +403,6 @@ Res <-
   )
 ```
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
-```{r}
-head(Res$statistics)
-```
 
 # Session Info
 
