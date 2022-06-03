@@ -12,12 +12,11 @@
 #' @param design: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.
 #' @param EMmaxiter an integer indicating the number of iterations in the EM algorithm.
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
-#' @param verbose logical. If TRUE, print intermediate information.
 #' @examples
 #' data(mandata)
 #' a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
 
-fitpt.m0 <- function(expr, cellanno, pseudotime, design, EMmaxiter=100, EMitercutoff=0.05, verbose=F) {
+fitpt.m0 <- function(expr, cellanno, pseudotime, design, EMmaxiter=100, EMitercutoff=0.05) {
   pseudotime <- pseudotime[colnames(expr)]
   cellanno <- cellanno[match(colnames(expr),cellanno[,1]),]
   sname <- sapply(unique(cellanno[,2]),function(i) cellanno[cellanno[,2]==i,1],simplify = F)

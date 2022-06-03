@@ -14,7 +14,6 @@ fitpt_h5(
   maxknotallowed = 10,
   EMmaxiter = 100,
   EMitercutoff = 0.05,
-  verbose = F,
   ncores = 1,
   model = 3,
   knotnum = NULL
@@ -35,8 +34,6 @@ fitpt_h5(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
-
 \item{ncores}{number of cores used when performing the spline fitting for genes.}
 
 \item{model}{a numeric number (1,2,or 3) indicating which model from the nesting models will be used for fitting.  Model 0 is implemented by the function fitpt.m0().}
@@ -53,7 +50,7 @@ This function is used to perform the model fitting.
 }
 \examples{
 data(mandata)
-a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
+a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, ncores=1, model = 1)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

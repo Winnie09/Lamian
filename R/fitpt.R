@@ -14,14 +14,13 @@
 #' @param maxknotallowed a numeric number. Max number of knots applied in the B-spline fitting.
 #' @param EMmaxiter an integer indicating the number of iterations in the EM algorithm.
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
-#' @param verbose logical. If TRUE, print intermediate information.
 #' @param ncores number of cores used when performing the spline fitting for genes.
 #' @param model a numeric number (1,2,or 3) indicating which model from the nesting models will be used for fitting.  Model 0 is implemented by the function fitpt.m0().
 #' @param knotnum If NULL (default), this function will automatically select the optimal number of knots for each gene. If specified by a numeric vector whose names are gene names, this function will used the specified number of knots for those genes. This argument is used to speed up the fitting if the number of knots has been known.
 #' @examples
 #' data(mandata)
-#' a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose=FALSE, ncores=1, model = 1)
-fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=100, EMitercutoff=0.05, verbose=F, ncores=1, model = 3, knotnum = NULL) {
+#' a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose.output=FALSE, ncores=1, model = 1)
+fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=100, EMitercutoff=0.05, ncores=1, model = 3, knotnum = NULL) {
   pseudotime <- pseudotime[colnames(expr)]
   cellanno <- cellanno[match(colnames(expr),cellanno[,1]),]
   sname <- sapply(row.names(design),function(i) cellanno[cellanno[,2]==i,1],simplify = F)
@@ -90,9 +89,7 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
   }
   
   sfit <- function(num.knot) {
-    #print(paste0('num.knot = ', num.knot))
     gid <- names(which(knotnum==num.knot))
-    #print(gid)
     sexpr <- expr[gid,,drop=F] ## !!! double check, should be list len =S
     phi <- philist[[as.character(num.knot)]]
     phicrossprod <- apply(phi,1,tcrossprod)
@@ -264,8 +261,6 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
       logdv <- -2*colSums(log(sapply(Jchol,as.vector)[seq(1,nb*nb,nb+1),,drop=F]))
       alpha[gid]*log(2*eta[gid])+lgamma(cn[s]/2+alpha[gid])-cn[s]*log(pi)/2-lgamma(alpha[gid])-omegadet+logdv/2-(cn[s]/2+alpha[gid])*log(L2eKJK)
     }),nrow=length(gid),dimnames=list(gid,NULL)))
-    
-    # print(table(apply(all,1,function(i) mean(diff(i) >= 0))))  
     return(list(beta = B, alpha = alpha, eta = eta, omega = omega, ll = ll))
   }
   

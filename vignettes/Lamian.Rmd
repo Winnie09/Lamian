@@ -28,12 +28,12 @@ package: Lamian
 output: 
   BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{1. Lamian package}
+%\VignetteIndexEntry{1. Lamian package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
----
-
-```{r setup, include=FALSE}
+  ---
+  
+  ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -62,7 +62,7 @@ suppressMessages(library(Lamian))
 
 The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch's detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples' proportion in each branch. 
 
-### data preparation
+### Data preparation
 
 We will need a gene by cell expression matrix, the low-dimension representation of the cells, and the cell annotation (which sample each cell belongs to). Here, we use example data **hca_bm_saver**, **hca_bm_pca**, **hca_bm_cellanno** to demonstrate their data structures. Users can read in their own data of interest in this step.
 
@@ -75,7 +75,7 @@ data(man_tree_data)
 str(man_tree_data)
 ```
 
-### infer tree structure
+### Infer tree structure
 
 ```{r}
 set.seed(12345)
@@ -93,15 +93,15 @@ As we can see from the above inputs, there are five clusters, and the tree struc
 names(res)
 ```
 
-### plot the tree structure
+### Plot the tree structure
 
 ```{r fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
-plotmclust(res, cell_point_size = 0.5, 
+Lamian::plotmclust(res, cell_point_size = 0.5, 
            x.lab = 'Principal component 1', 
            y.lab = 'Principal component 2')
 ```
 
-### evaluate the uncertainty of tree branches
+### Evaluate the uncertainty of tree branches
 
 We can call the function **evaluate_uncertainty()** to evaluate the tree topology uncertainty. We suggested that users set **n.permute = 100** or more to ensure enough randomness to construct the null distribution, but here we set **n.permute = 5** in order to provide a simplified example. 
 
@@ -133,10 +133,11 @@ result[[3]]
 
 Module 2 of Lamian first identifies variation in tree topology across samples and then assesses if there are differential topological changes associated with sample covariates. For each sample, Lamian calculates the proportion of cells in each tree branch, referred to as *branch cell proportion*. Because a zero or low proportion can reflect absence or depletion of a branch, changes in tree topology can be described using branch cell proportion changes. With multiple samples, Lamian characterizes the cross-sample variation of each branch by estimating the variance of the branch cell proportion across samples. Furthermore, regression models can be fit to test whether the branch cell proportion is associated with sample covariates. This allows one to identify tree topology changes between different conditions, for example in a case-control cohort.
 
-```{r eval = FALSE}
+```{r}
 data = result[[2]]
-rownames(data) <- c('HSC->lymphocyte', 'HSC->myeloid', 'HSC->erythroid')
-design = data.frame(sample= paste0('BM',1,8), sex = c(0, rep(1,4), rep(0,3)))
+rownames(data) <-
+  c('HSC->lymphocyte', 'HSC->myeloid', 'HSC->erythroid')
+design = data.frame(sample = paste0('BM', 1, 8), sex = c(0, rep(1, 4), rep(0, 3)))
 branchPropTest(data = data, design = design)
 ```
 
@@ -144,7 +145,7 @@ branchPropTest(data = data, design = design)
 
 ## XDE test
 
-### data preparation
+### Data preparation
 
 In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any other interesting dataset. 
 
@@ -174,7 +175,7 @@ print(expdata$design)
 
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
-### perform XDE test
+### Perform XDE test
 We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
 ```{r}
 Res <- lamian_test(expr = expdata$expr, 
@@ -187,16 +188,17 @@ Res <- lamian_test(expr = expdata$expr,
                    ncores = 1)
 ```
 
-### downstream analysis 1: visualize and cluster XDE genes based on their multiple-sample temporal patterns across sample covariates
+### Downstream analysis 1: visualize and cluster XDE genes based on their multiple-sample temporal patterns across sample covariates
 
 We will know which are XDE from the **statistics** data frame in the result object **Res**.
 ```{r}
-## get differential dynamic genes statistics 
+## get differential dynamic genes statistics
 stat <- Res$statistics
 head(stat)
-stat <- stat[order(stat[,1], -stat[,3]), ]
+stat <- stat[order(stat[, 1],-stat[, 3]),]
 ## identify XDE genes with FDR.overall < 0.05 cutoff
-diffgene <- rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05,])
+diffgene <-
+  rownames(stat[stat[, grep('^fdr.*overall$', colnames(stat))] < 0.05, ])
 str(diffgene)
 ```
 
@@ -204,23 +206,33 @@ str(diffgene)
 We will get the population-level estimates for all the XDE genes by applying function `getPopulationFit()`.
 ```{r}
 ## population fit
-Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'variable')
+Res$populationFit <-
+  getPopulationFit(Res, gene = diffgene, type = 'variable')
 ```
 
 
 We can apply `getCovariateGroupDiff()` to calculate the group difference regarding this sample covariate, and then cluster the XDE genes based on the group difference. By setting **k = 4**, we will get two clusters for meanSig XDE genes, and the other two clusters for XDE genes of other types.
 ```{r}
 ## clustering
-Res$covariateGroupDiff <- getCovariateGroupDiff(testobj = Res, gene = diffgene)
-Res$cluster <- clusterGene(Res, gene = diffgene, type = 'variable', k=5)
+Res$covariateGroupDiff <-
+  getCovariateGroupDiff(testobj = Res, gene = diffgene)
+Res$cluster <-
+  clusterGene(Res, gene = diffgene, type = 'variable', k = 5)
 table(Res$cluster)
 ```
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
 ```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE}
-colnames(Res$populationFit[[1]]) <- colnames(Res$populationFit[[2]]) <- colnames(Res$expr) 
-plotXDEHm(Res, cellWidthTotal = 180, cellHeightTotal = 350, subsampleCell = FALSE, sep = ':.*')
+colnames(Res$populationFit[[1]]) <-
+  colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
+plotXDEHm(
+  Res,
+  cellWidthTotal = 180,
+  cellHeightTotal = 350,
+  subsampleCell = FALSE,
+  sep = ':.*'
+)
 ```
 
 We can plot the cluster mean and difference.
@@ -230,7 +242,7 @@ plotClusterMeanAndDiff(Res)
 ```
 We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
 
-### downstream analysis 2: Gene ontology (GO) enrichment analysis
+### Downstream analysis 2: Gene ontology (GO) enrichment analysis
 We can further check out whether the XDE genes in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
 Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. 
 In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`. 
@@ -238,22 +250,24 @@ In practice, if there are significant GO terms in the clusters, we can generate 
 
 ## TDE test
 
-### data preparation
+### Data preparation
 The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
 
-### perform TDE test
+### Perform TDE test
 Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
 ```{r}
-Res <- lamian_test(expr = expdata$expr, 
-                   cellanno = expdata$cellanno, 
-                   pseudotime = expdata$pseudotime, 
-                   design = expdata$design, 
-                   test.type = 'time', 
-                   permuiter = 5)
+Res <- lamian_test(
+  expr = expdata$expr,
+  cellanno = expdata$cellanno,
+  pseudotime = expdata$pseudotime,
+  design = expdata$design,
+  test.type = 'time',
+  permuiter = 5
+)
 names(Res)
 ```
 
-### downstream analysis 1: visualize and cluster TDE genes based on their multiple-sample temporal patterns
+### Downstream analysis 1: visualize and cluster TDE genes based on their multiple-sample temporal patterns
 
 The result object is a list containing multiple elements. The first element is a dataframe of statistics. 
 ```{r}
@@ -262,19 +276,21 @@ head(Res$statistics)
 
 We can further determine the TDE genes as the genes with **fdr.overall** $< 0.05$.
 ```{r}
-diffgene <- rownames(Res$statistics)[Res$statistics[,1] < 0.05]
+diffgene <- rownames(Res$statistics)[Res$statistics[, 1] < 0.05]
 str(diffgene)
 ```
 
 
 We can estimate the population-level model-fitted patterns for all TDE genes.
 ```{r}
-Res$populationFit <- getPopulationFit(Res, gene = diffgene, type = 'time')
+Res$populationFit <-
+  getPopulationFit(Res, gene = diffgene, type = 'time')
 ```
 
 Then we can further cluster these genes.
 ```{r}
-Res$cluster <- clusterGene(Res, gene = diffgene, type = 'time', k=3)
+Res$cluster <-
+  clusterGene(Res, gene = diffgene, type = 'time', k = 3)
 ```
 
 We can visualize the temporal patterns and compare original and fitted expression
@@ -291,27 +307,29 @@ plotTDEHm(
 
 To plot cluster mean patterns.
 ```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE}
-plotClusterMean(testobj=Res, cluster = Res$cluster, type = 'time')
+plotClusterMean(testobj = Res,
+                cluster = Res$cluster,
+                type = 'time')
 ```
 
-### downstream analysis 2: GO analysis for TDE genes
+### Downstream analysis 2: GO analysis for TDE genes
 Similar to **XDE test**, we can further proceed to identify the enriched GO terms for each gene cluster using commands `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')`. Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. In practice, if there are enriched GO terms, we can plot them using commands `plotGOEnrich(goRes = goRes)`. 
 
 # Module 4: trajectory differential test based on cell composition
 
 ## TCD test
 
-### data preparation
+### Data preparation
 
 The inputs  are the same as those for TDE test (see above), except that we don not need gene expression matrix.
 
-### perform cell proportion test
+### Perform cell proportion test
 ```{r eval = FALSE}
 Res <-
   cellPropTest(
     cellanno = expdata$cellanno,
     pseudotime = expdata$pseudotime,
-    design = expdata$design[,1,drop=F],
+    design = expdata$design[, 1, drop = F],
     ncores = 4,
     test.type = 'Time'
   )

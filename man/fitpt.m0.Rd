@@ -10,8 +10,7 @@ fitpt.m0(
   pseudotime,
   design,
   EMmaxiter = 100,
-  EMitercutoff = 0.05,
-  verbose = F
+  EMitercutoff = 0.05
 )
 }
 \arguments{
@@ -24,8 +23,6 @@ fitpt.m0(
 \item{EMmaxiter}{an integer indicating the number of iterations in the EM algorithm.}
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
-
-\item{verbose}{logical. If TRUE, print intermediate information.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
 }

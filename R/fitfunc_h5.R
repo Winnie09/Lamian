@@ -16,14 +16,14 @@
 #' @param design: a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.
 #' @param EMmaxiter an integer indicating the number of iterations in the EM algorithm.
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
-#' @param verbose logical. If TRUE, print intermediate information.
+#' @param verbose.output logical. If TRUE, print intermediate information.
 #' @param ncores the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.
-fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testvar, test.type = 'Time', expr = expr, cellanno = cellanno, pseudotime = pseudotime, design = design, EMmaxiter = 100, EMitercutoff = 0.05, verbose = F, ncores = 1) {
-  print(paste0('iter ', iter, '\n'))
+fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testvar, test.type = 'Time', expr = expr, cellanno = cellanno, pseudotime = pseudotime, design = design, EMmaxiter = 100, EMitercutoff = 0.05, verbose.output = F, ncores = 1) {
+  if (verbose.output) print(paste0('iter ', iter, '\n'))
   if (toupper(test.type)=='TIME') {
     if (iter == 1) {
-      fitres.full <- fitpt_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],testvar=testvar,targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model=-1)
-      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],testvar=testvar,targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model=-1)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
       return(list(fitres.full = fitres.full, fitres.null = fitres.null))
     } else {
       perpsn <- lapply(rownames(design), function(s){
@@ -42,18 +42,18 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       perpsn <- perpsn[sampcell]
       boot <- data.frame(percellanno[,1],paste0('cell_',1:length(perpsn)),stringsAsFactors = F) #### rename cells
       percellanno[,1] <- names(perpsn) <- paste0('cell_',1:length(perpsn)) ## save the original cell name and permuted cell names relation, not used here actually, because hdf5 file already save the cells for each sample seperately
-      fitres.full <- fitpt_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = -1,testvar=testvar)
-      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose)
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = -1,testvar=testvar)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
       if (exists('fitres.full') & exists('fitres.null')) {
-        print(paste0('iter ', iter, ' success!'))
+        if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
       } else {
-        print(paste0('iter ', iter, ' try again!'))
+        if (verbose.output) print(paste0('iter ', iter, ' try again!'))
         return(NULL)
       }
     }
   } else if (toupper(test.type)=='VARIABLE'){
-    print('testing Variable ...')
+    if (verbose.output) print('testing Variable ...')
     if (diffType == 'overall'){
       mod.full = 3
       mod.null = 1
@@ -65,16 +65,16 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.full,testvar=testvar)
-      fitres.null <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=1, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
+      fitres.full <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full,testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
-        print(paste0('iter ', iter, ' success!'))
+        if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
       } else if (!exists('fitres.full')){
-        print(paste0('iter ', iter, 'full model failed. Skip ...'))
+        if (verbose.output) print(paste0('iter ', iter, 'full model failed. Skip ...'))
         return(NULL)
       } else {
-        print(paste0('iter ', iter, 'null model failed. Skip ...'))
+        if (verbose.output) print(paste0('iter ', iter, 'null model failed. Skip ...'))
         return(NULL)
       }
     } else {
@@ -94,16 +94,16 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       percellanno[,1] <- names(psn) <- paste0('cell_',1:length(psn))
       
       
-      fitres.full <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.full,testvar=testvar)
-      fitres.null <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose=verbose, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
+      fitres.full <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.full,testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
-        print(paste0('iter ', iter, ' success!'))
+        if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
       } else if (!exists('fitres.full')){
-        print(paste0('iter ', iter, 'full model failed. Skip ...'))
+        if (verbose.output) print(paste0('iter ', iter, 'full model failed. Skip ...'))
         return(NULL)
       } else {
-        print(paste0('iter ', iter, 'null model failed. Skip ...'))
+        if (verbose.output) print(paste0('iter ', iter, 'null model failed. Skip ...'))
         return(NULL)
       }
     }

@@ -16,7 +16,7 @@ fitfunc_h5(
   design = design,
   EMmaxiter = 100,
   EMitercutoff = 0.05,
-  verbose = F,
+  verbose.output = F,
   ncores = 1
 )
 }
@@ -41,7 +41,7 @@ fitfunc_h5(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
+\item{verbose.output}{logical. If TRUE, print intermediate information.}
 
 \item{ncores}{the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.}
 

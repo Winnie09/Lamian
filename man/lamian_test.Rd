@@ -13,12 +13,12 @@ lamian_test(
   permuiter = 100,
   EMmaxiter = 100,
   EMitercutoff = 0.05,
-  verbose = F,
+  verbose.output = FALSE,
   ncores = detectCores(),
   test.type = "Time",
   fit.resolution = 1000,
   return.all.data = TRUE,
-  overall.only = F,
+  overall.only = FALSE,
   test.method = "permutation",
   ncores.fit = 1,
   fix.all.zero = TRUE,
@@ -41,7 +41,7 @@ lamian_test(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
+\item{verbose.output}{logical. If TRUE, print intermediate information.}
 
 \item{ncores}{number of cores for performing the permutation test.}
 
@@ -69,7 +69,7 @@ This function is designed for doing different tests.
 }
 \examples{
 data(mandata)
-a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10)
+a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10, verbose.output = FALSE)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

@@ -11,8 +11,7 @@ fitpt_m0_h5(
   targetgene = NULL,
   boot = NULL,
   EMmaxiter = 100,
-  EMitercutoff = 0.05,
-  verbose = F
+  EMitercutoff = 0.05
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ fitpt_m0_h5(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
-
 \item{cellanno}{a dataframe where the first column are cell names and second column are sample names.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
@@ -40,7 +37,7 @@ This function is used to perform the model 0 (beta0 for intercept base only) fit
 }
 \examples{
 data(mandata)
-a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
+a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

@@ -12,12 +12,12 @@ fitfunc(
   testvar = testvar,
   EMmaxiter = 100,
   EMitercutoff = 0.05,
-  verbose = F,
   ncores = 1,
   expr = expr,
   cellanno = cellanno,
   pseudotime = pseudotime,
-  design = design
+  design = design,
+  verbose.output = FALSE
 )
 }
 \arguments{
@@ -35,8 +35,6 @@ fitfunc(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
-
 \item{ncores}{the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.}
 
 \item{expr}{gene by cell expression matrix. The expression values should have been library-size-normalized and log-transformed. They can either be imputed or non-imputed.}
@@ -44,6 +42,8 @@ fitfunc(
 \item{cellanno}{a dataframe where the first column are cell names and second column are sample names.}
 
 \item{pseudotime}{a numeric vector of pseudotime, and the names of this vector are the corresponding cell names.}
+
+\item{verbose.output}{logical. If TRUE, print intermediate information.}
 
 \item{design:}{a matrix. Number of rows should be the same as the number of unique samples. Rownames are sample names. First column is the intercept (all 1), second column is the covariate realization valuels for each of the samples.}
 }

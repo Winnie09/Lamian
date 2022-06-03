@@ -13,7 +13,7 @@ lamian_test_h5(
   permuiter = 100,
   EMmaxiter = 100,
   EMitercutoff = 0.05,
-  verbose = F,
+  verbose.output = F,
   ncores = detectCores(),
   test.type = "Time",
   fit.resolution = 1000,
@@ -40,7 +40,7 @@ lamian_test_h5(
 
 \item{EMitercutoff}{a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm}
 
-\item{verbose}{logical. If TRUE, print intermediate information.}
+\item{verbose.output}{logical. If TRUE, print intermediate information.}
 
 \item{ncores}{number of cores for performing the permutation test.}
 

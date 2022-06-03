@@ -14,12 +14,11 @@
 
 #' @param EMmaxiter an integer indicating the number of iterations in the EM algorithm.
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
-#' @param verbose logical. If TRUE, print intermediate information.
 #' @examples
 #' data(mandata)
-#' a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
+#' a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10)
 
-fitpt_m0_h5 <- function(expr, pseudotime, design, targetgene=NULL, boot=NULL, EMmaxiter=100, EMitercutoff=0.05, verbose=F) {
+fitpt_m0_h5 <- function(expr, pseudotime, design, targetgene=NULL, boot=NULL, EMmaxiter=100, EMitercutoff=0.05) {
   # set.seed(12345)
   samp <- h5ls(expr,recursive=F)$name
   sname <- sapply(samp,function(s) as.vector(h5read(expr,paste0(s,'/barcode'))))
@@ -151,7 +150,7 @@ fitpt_m0_h5 <- function(expr, pseudotime, design, targetgene=NULL, boot=NULL, EM
     rm(list = c('L','Jsolve', 'K'))
   }
   
- 
+  
   ll <- rowSums(matrix(sapply(as,function(s) {
     expr_phibx <- sapply(as,function(s) {
       exprreadfunc(s,match(targetgene,gn))-B[targetgene]
