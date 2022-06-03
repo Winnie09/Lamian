@@ -25,8 +25,8 @@ maintainer:
       - "whou10@jhu.edu"
 package: Lamian
 output: 
-  html_document:
   pdf_document: default
+  html_document:
   df_print: paged
 vignette: >
   %\VignetteIndexEntry{1. Lamian package}
