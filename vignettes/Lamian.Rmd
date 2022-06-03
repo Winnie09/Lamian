@@ -1,5 +1,5 @@
 ---
-title: "Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq "
+title: "Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq samples"
 author: 
   - name: Wenpin Hou
     affiliation: 
