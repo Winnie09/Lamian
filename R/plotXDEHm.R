@@ -2,7 +2,7 @@
 #'
 #' This function is used for plotting the fitting heatmaps for the XDE test.
 #'
-#' @import ggplot2 RColorBrewer gridExtra viridis ComplexHeatmap grDevices
+#' @import ggplot2 RColorBrewer gridExtra viridis ComplexHeatmap grDevices circlize
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
@@ -150,9 +150,12 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   expr = testobj$expr
   expr <- expr[, names(testobj$pseudotime)]
   
-  
+  ##### << debug from here 
   tmp <- lapply(names(fit), function(i){
-    expr[rownames(fit.scale), colnames(expr) %in% cellanno[cellanno[, 2] %in% rownames(testobj$design)[testobj$design[, testvar] == sub('.*_','', i)], 1]]
+    
+    b <- cellanno[, 2] %in% rownames(testobj$design)[testobj$design[, testvar] == sub('.*_','', i)]
+    a <- cellanno[b, 1]
+    expr[rownames(fit.scale), colnames(expr) %in% a]
   })
   expr.scale <- do.call(cbind, tmp)
   expr.scale <- scalematrix(expr.scale)
@@ -244,9 +247,9 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   p1data[p1data > quantile(as.vector(p1data), 0.95,na.rm=T)] <- quantile(as.vector(p1data), 0.95,na.rm=T)
   p1data[p1data < quantile(as.vector(p1data), 0.05,na.rm=T)] <- quantile(as.vector(p1data), 0.05,na.rm=T)
   
-  col_fun = colorRamp2(seq(-max(abs(p1data)),max(abs(p1data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
+  col_fun = circlize::colorRamp2(seq(-max(abs(p1data)),max(abs(p1data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
   
-  pt_col_fun = colorRamp2(seq(1,max(colann$pseudotime)), colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(max(colann$pseudotime)))
+  pt_col_fun = circlize::colorRamp2(seq(1,max(colann$pseudotime)), colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(max(colann$pseudotime)))
   annotation_colors$pseudotime <- pt_col_fun
   ht1 <- ComplexHeatmap::Heatmap(
     p1data,
@@ -288,8 +291,8 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   p2data[p2data > quantile(as.vector(p2data), 0.99,na.rm=T)] <- quantile(as.vector(p2data), 0.99,na.rm=T)
   p2data[p2data < quantile(as.vector(p2data), 0.01,na.rm=T)] <- quantile(as.vector(p2data), 0.01,na.rm=T)
   
-  col_fun = colorRamp2(seq(-max(abs(p2data)),max(abs(p2data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
-  pt_col_fun = colorRamp2(seq(1,length(unique(colann.fit$pseudotime))), colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime))))
+  col_fun = circlize::colorRamp2(seq(-max(abs(p2data)),max(abs(p2data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
+  pt_col_fun = circlize::colorRamp2(seq(1,length(unique(colann.fit$pseudotime))), colorRampPalette(brewer.pal(n = 9, name = "YlGnBu"))(length(unique(colann.fit$pseudotime))))
   annotation_colors$pseudotime <- pt_col_fun
   ht2 <- ComplexHeatmap::Heatmap(
     p2data,
@@ -307,7 +310,7 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   p3data[p3data > quantile(as.vector(p3data), 0.99,na.rm=T)] <- quantile(as.vector(p3data), 0.99,na.rm=T)
   p3data[p3data < quantile(as.vector(p3data), 0.01,na.rm=T)] <- quantile(as.vector(p3data), 0.01,na.rm=T)
   
-  col_fun = colorRamp2(seq(-max(abs(p3data)),max(abs(p3data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
+  col_fun = circlize::colorRamp2(seq(-max(abs(p3data)),max(abs(p3data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
   
   ht3 <- ComplexHeatmap::Heatmap(
     p3data,
@@ -326,7 +329,7 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   p4data[p4data > quantile(as.vector(p4data), 0.99,na.rm=T)] <- quantile(as.vector(p4data), 0.99,na.rm=T)
   p4data[p4data < quantile(as.vector(p4data), 0.01,na.rm=T)] <- quantile(as.vector(p4data), 0.01,na.rm=T)
   p4data[rownames(p4data) %in% sub(':.*','',rownames(rowann)[rowann$XDEType=='meanSig']),] <- 0
-  col_fun = colorRamp2(seq(-max(abs(p4data)),max(abs(p4data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
+  col_fun = circlize::colorRamp2(seq(-max(abs(p4data)),max(abs(p4data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
   
   ht4 <- ComplexHeatmap::Heatmap(
     p4data,
@@ -345,7 +348,7 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
   rownames(p5data) <- rownames(p4data)
   p5data[rownames(p5data) %in% sub(':.*','',rownames(rowann)[rowann$XDEType=='trendSig']),] <- 0
   
-  col_fun = colorRamp2(seq(-max(abs(p5data)),max(abs(p5data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
+  col_fun = circlize::colorRamp2(seq(-max(abs(p5data)),max(abs(p5data)),length.out=50), colorRampPalette(c('blue3','skyblue','white','pink','red3'))(50))
   
   ht5 <- ComplexHeatmap::Heatmap(
     p5data,

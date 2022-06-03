@@ -27,8 +27,8 @@ names(res)
 
 ## ----fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'----
 Lamian::plotmclust(res, cell_point_size = 0.5, 
-           x.lab = 'Principal component 1', 
-           y.lab = 'Principal component 2')
+                   x.lab = 'Principal component 1', 
+                   y.lab = 'Principal component 2')
 
 ## -----------------------------------------------------------------------------
 result <- evaluate_uncertainty(res, n.permute=5)
@@ -98,20 +98,20 @@ Res$cluster <-
   clusterGene(Res, gene = diffgene, type = 'variable', k = 5)
 table(Res$cluster)
 
-## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE----
-#  colnames(Res$populationFit[[1]]) <-
-#    colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
-#  plotXDEHm(
-#    Res,
-#    cellWidthTotal = 180,
-#    cellHeightTotal = 350,
-#    subsampleCell = FALSE,
-#    sep = ':.*'
-#  )
+## ----fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=TRUE----
+colnames(Res$populationFit[[1]]) <-
+  colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
+plotXDEHm(
+  Res,
+  cellWidthTotal = 180,
+  cellHeightTotal = 350,
+  subsampleCell = FALSE,
+  sep = ':.*'
+)
 
-## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE----
-#  ## plotClusterMeanAndDiff
-#  plotClusterMeanAndDiff(Res)
+## ----fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = TRUE----
+## plotClusterMeanAndDiff
+plotClusterMeanAndDiff(Res)
 
 ## -----------------------------------------------------------------------------
 Res <- lamian_test(
@@ -139,44 +139,44 @@ Res$populationFit <-
 Res$cluster <-
   clusterGene(Res, gene = diffgene, type = 'time', k = 3)
 
-## ----fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE----
-#  plotTDEHm(
-#    Res,
-#    subsampleCell  = FALSE,
-#    showCluster = TRUE,
-#    type = 'time',
-#    cellWidthTotal = 200,
-#    cellHeightTotal = 200
-#  )
+## ----fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = TRUE----
+plotTDEHm(
+  Res,
+  subsampleCell  = FALSE,
+  showCluster = TRUE,
+  type = 'time',
+  cellWidthTotal = 200,
+  cellHeightTotal = 200
+)
 
-## ----fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE----
-#  plotClusterMean(testobj = Res,
-#                  cluster = Res$cluster,
-#                  type = 'time')
+## ----fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = TRUE----
+plotClusterMean(testobj = Res,
+                cluster = Res$cluster,
+                type = 'time')
 
-## ----eval = FALSE-------------------------------------------------------------
-#  Res <-
-#    cellPropTest(
-#      cellanno = expdata$cellanno,
-#      pseudotime = expdata$pseudotime,
-#      design = expdata$design[, 1, drop = F],
-#      ncores = 4,
-#      test.type = 'Time'
-#    )
+## ----eval = TRUE--------------------------------------------------------------
+Res <-
+  cellPropTest(
+    cellanno = expdata$cellanno,
+    pseudotime = expdata$pseudotime,
+    design = expdata$design[, 1, drop = F],
+    ncores = 4,
+    test.type = 'Time'
+  )
 
 ## -----------------------------------------------------------------------------
 head(Res$statistics)
 
-## ----eval = FALSE-------------------------------------------------------------
-#  Res <-
-#    cellPropTest(
-#      cellanno = expdata$cellanno,
-#      pseudotime = expdata$pseudotime,
-#      design = expdata$design,
-#      ncores = 4,
-#      test.type = 'Variable',
-#      testvar = 2
-#    )
+## ----eval = TRUE--------------------------------------------------------------
+Res <-
+  cellPropTest(
+    cellanno = expdata$cellanno,
+    pseudotime = expdata$pseudotime,
+    design = expdata$design,
+    ncores = 4,
+    test.type = 'Variable',
+    testvar = 2
+  )
 
 ## -----------------------------------------------------------------------------
 head(Res$statistics)

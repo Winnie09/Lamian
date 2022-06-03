@@ -23,17 +23,18 @@ maintainer:
   - name: Wenpin Hou
     email: 
       - "whou10@jhu.edu"
-  
 package: Lamian
 output: 
-  BiocStyle::html_document
+  html_document:
+  pdf_document: default
+  df_print: paged
 vignette: >
-%\VignetteIndexEntry{1. Lamian package}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{1. Lamian package}
   %\VignetteEncoding{UTF-8}
-  ---
-  
-  ```{r setup, include=FALSE}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -97,8 +98,8 @@ names(res)
 
 ```{r fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
 Lamian::plotmclust(res, cell_point_size = 0.5, 
-           x.lab = 'Principal component 1', 
-           y.lab = 'Principal component 2')
+                   x.lab = 'Principal component 1', 
+                   y.lab = 'Principal component 2')
 ```
 
 ### Evaluate the uncertainty of tree branches
@@ -223,7 +224,7 @@ table(Res$cluster)
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
-```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE}
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=TRUE}
 colnames(Res$populationFit[[1]]) <-
   colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
 plotXDEHm(
@@ -236,7 +237,7 @@ plotXDEHm(
 ```
 
 We can plot the cluster mean and difference.
-```{r fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE}
+```{r fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = TRUE}
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 ```
@@ -294,7 +295,7 @@ Res$cluster <-
 ```
 
 We can visualize the temporal patterns and compare original and fitted expression
-```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE}
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = TRUE}
 plotTDEHm(
   Res,
   subsampleCell  = FALSE,
@@ -306,7 +307,7 @@ plotTDEHm(
 ```
 
 To plot cluster mean patterns.
-```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE}
+```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = TRUE}
 plotClusterMean(testobj = Res,
                 cluster = Res$cluster,
                 type = 'time')
@@ -324,7 +325,7 @@ Similar to **XDE test**, we can further proceed to identify the enriched GO term
 The inputs  are the same as those for TDE test (see above), except that we don not need gene expression matrix.
 
 ### Perform cell proportion test
-```{r eval = FALSE}
+```{r eval = TRUE}
 Res <-
   cellPropTest(
     cellanno = expdata$cellanno,
@@ -343,7 +344,7 @@ head(Res$statistics)
 ## XCD test
 
 The inputs are the same for XDE test (see above), except that we do not need gene expression matrix. 
-```{r eval = FALSE}
+```{r eval = TRUE}
 Res <-
   cellPropTest(
     cellanno = expdata$cellanno,

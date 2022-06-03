@@ -23,17 +23,18 @@ maintainer:
   - name: Wenpin Hou
     email: 
       - "whou10@jhu.edu"
-  
 package: Lamian
 output: 
-  BiocStyle::html_document
+  html_document:
+  pdf_document: default
+  df_print: paged
 vignette: >
-%\VignetteIndexEntry{1. Lamian package}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{1. Lamian package}
   %\VignetteEncoding{UTF-8}
-  ---
-  
-  ```{r setup, include=FALSE}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -97,8 +98,8 @@ names(res)
 
 ```{r fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
 Lamian::plotmclust(res, cell_point_size = 0.5, 
-           x.lab = 'Principal component 1', 
-           y.lab = 'Principal component 2')
+                   x.lab = 'Principal component 1', 
+                   y.lab = 'Principal component 2')
 ```
 
 ### Evaluate the uncertainty of tree branches
@@ -147,6 +148,8 @@ branchPropTest(data = data, design = design)
 
 ### Data preparation
 
+### Gene expression in matrix form
+
 In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any other interesting dataset. 
 
 ```{r}
@@ -175,17 +178,55 @@ print(expdata$design)
 
 The function `lamian.test()` is designed to perform multiple tests. To perform the Sample Covariate Test, we need to set **test.type = 'variable'**.
 
-### Perform XDE test
-We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
+
+
+### Gene expression in hdf5 format (for ultra-large datasets)
+
+For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed with a faster speed. 
+
+
+To save the gene expression in hdf5 file format, we apply the following codes which creates a new file **data/multi.h5** (file *multi.h5* in the folder *data/* )
 ```{r}
-Res <- lamian_test(expr = expdata$expr, 
-                   cellanno = expdata$cellanno, 
-                   pseudotime = expdata$pseudotime, 
-                   design = expdata$design, 
-                   test.type = 'variable', 
-                   testvar = 2,
-                   permuiter = 5,
-                   ncores = 1)
+saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
+```
+
+
+### Perform XDE test
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**.  
+
+By default, **test.method = 'permutation'**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to saver the running time. We recommend setting **permuiter = 100** or higher in real applications.  We also provide **test.method = 'chisq'**. 
+
+Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
+
+If the gene expression is in a regular matrix format,
+```{r}
+Res <- lamian_test(
+  expr = expdata$expr,
+  cellanno = expdata$cellanno,
+  pseudotime = expdata$pseudotime,
+  design = expdata$design,
+  test.type = 'variable',
+  testvar = 2,
+  permuiter = 5,
+  ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  ncores = 1
+)
+```
+
+
+If the gene expression is in an hdf5 file format,
+```{r eval=FALSE}
+Res <- lamian_test_h5(
+  expr = 'data/multi.h5',
+  cellanno = expdata$cellanno,
+  pseudotime = expdata$pseudotime,
+  design = expdata$design,
+  test.type = 'variable',
+  testvar = 2,
+  permuiter = 5,
+  ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  ncores = 1
+)
 ```
 
 ### Downstream analysis 1: visualize and cluster XDE genes based on their multiple-sample temporal patterns across sample covariates
@@ -223,7 +264,7 @@ table(Res$cluster)
 
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
-```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=FALSE}
+```{r fig_sct_plotDiffFitHm3, fig.height = 6, fig.width = 9, fig.align = "center", eval=TRUE}
 colnames(Res$populationFit[[1]]) <-
   colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
 plotXDEHm(
@@ -236,7 +277,7 @@ plotXDEHm(
 ```
 
 We can plot the cluster mean and difference.
-```{r fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 12, fig.align = "center", eval = FALSE}
+```{r fig_plotClusterMeanAndDiff, fig.height = 10, fig.width = 4, fig.align = "center", eval = TRUE}
 ## plotClusterMeanAndDiff
 plotClusterMeanAndDiff(Res)
 ```
@@ -255,6 +296,8 @@ The inputs for Constant Time Test are the same as those for Sample Covariate Tes
 
 ### Perform TDE test
 Similar to the XDE test, we can perform *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to saver the running time. We recommend setting **permuiter = 100** or higher in real applications. 
+
+If the gene expression is in a matrix format,
 ```{r}
 Res <- lamian_test(
   expr = expdata$expr,
@@ -266,6 +309,19 @@ Res <- lamian_test(
 )
 names(Res)
 ```
+
+If the gene expression is in an hdf5 file format,
+```{r eval=FALSE}
+Res <- lamian_test_h5(
+  expr = 'data/multi.h5',
+  cellanno = expdata$cellanno,
+  pseudotime = expdata$pseudotime,
+  design = expdata$design,
+  test.type = 'time',
+  permuiter = 5
+) ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test. 
+```
+
 
 ### Downstream analysis 1: visualize and cluster TDE genes based on their multiple-sample temporal patterns
 
@@ -280,7 +336,6 @@ diffgene <- rownames(Res$statistics)[Res$statistics[, 1] < 0.05]
 str(diffgene)
 ```
 
-
 We can estimate the population-level model-fitted patterns for all TDE genes.
 ```{r}
 Res$populationFit <-
@@ -294,7 +349,7 @@ Res$cluster <-
 ```
 
 We can visualize the temporal patterns and compare original and fitted expression
-```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = FALSE}
+```{r fig_sct_plotTDEHm, fig.height = 4.5, fig.width = 10, fig.align = "center", eval = TRUE}
 plotTDEHm(
   Res,
   subsampleCell  = FALSE,
@@ -306,7 +361,7 @@ plotTDEHm(
 ```
 
 To plot cluster mean patterns.
-```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = FALSE}
+```{r fig_sct_plotclustermean, fig.height = 5, fig.width = 5, fig.align = "center", out.width = '40%', eval = TRUE}
 plotClusterMean(testobj = Res,
                 cluster = Res$cluster,
                 type = 'time')
@@ -324,7 +379,7 @@ Similar to **XDE test**, we can further proceed to identify the enriched GO term
 The inputs  are the same as those for TDE test (see above), except that we don not need gene expression matrix.
 
 ### Perform cell proportion test
-```{r eval = FALSE}
+```{r eval = TRUE}
 Res <-
   cellPropTest(
     cellanno = expdata$cellanno,
@@ -343,7 +398,7 @@ head(Res$statistics)
 ## XCD test
 
 The inputs are the same for XDE test (see above), except that we do not need gene expression matrix. 
-```{r eval = FALSE}
+```{r eval = TRUE}
 Res <-
   cellPropTest(
     cellanno = expdata$cellanno,
