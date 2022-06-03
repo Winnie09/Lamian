@@ -13,10 +13,10 @@ author:
   - name: E. John Wherry
     affiliation: 
       - &id2 "Department of Systems Pharmacology and Translational Therapeutics, Perelman School of Medicine, University of Pennsylvania"
-  - name: Stephanie C. Hicks
+  - name: Stephanie C. Hicks\*
     affiliation: 
       - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
-  - name: Hongkai Ji
+  - name: Hongkai Ji\*
     affiliation: 
       - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
 maintainer:
@@ -25,8 +25,8 @@ maintainer:
       - "whou10@jhu.edu"
 package: Lamian
 output: 
-  pdf_document: default
   html_document:
+  pdf_document: default
   df_print: paged
 vignette: >
   %\VignetteIndexEntry{1. Lamian package}
