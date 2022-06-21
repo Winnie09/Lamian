@@ -2,7 +2,7 @@
 #'
 #' This function is used to plot enriched GO terms for each of the clusters.
 #'
-#' @import ggplot2 RColorBrewer splines gridExtra viridis
+#' @import ggplot2 RColorBrewer splines gridExtra viridis reshape2
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @export
@@ -57,6 +57,7 @@ plotGOEnrich <-
     
     pd <- melt(dmat)
     colnames(pd) <- c('Term', 'Cluster', 'enc')
+    pd$Cluster = as.character(pd$Cluster)
     pd$Term <-
       factor(as.character(pd$Term), levels = names(v[rev(order(v))]))
     pd$enc <- ifelse(pd$enc, 'Non-significant', 'Significant')
@@ -64,6 +65,7 @@ plotGOEnrich <-
       ggplot(pd, aes(x = pd[,2], y = pd[,1], fill = pd[,3])) + geom_tile() + theme_classic() + scale_fill_manual(values =
                                                                                                                c('darkblue', 'orange')) +
       theme(legend.position = 'right') +
-      scale_y_discrete(position = "right")
+      scale_y_discrete(position = "right") +
+      xlab('Cluster') + ylab('GO Terms')
     return(p)
   }

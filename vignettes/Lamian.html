@@ -201,6 +201,8 @@ suppressMessages(library(Lamian))</code></pre>
 <p>The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch’s detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples’ proportion in each branch.</p>
 <div id="data-preparation" class="section level3">
 <h3>Data preparation</h3>
+<div id="use-the-matrixdataframelist-format" class="section level4">
+<h4>Use the matrix/dataframe/list format</h4>
 <p>We will need a gene by cell expression matrix, the low-dimension representation of the cells, and the cell annotation (which sample each cell belongs to). Here, we use example data <strong>hca_bm_saver</strong>, <strong>hca_bm_pca</strong>, <strong>hca_bm_cellanno</strong> to demonstrate their data structures. Users can read in their own data of interest in this step.</p>
 <pre class="r"><code>data(man_tree_data)</code></pre>
 <p><strong>man_tree_data</strong> is a list containing gene by cell expression matrix, low-dimension representation (PCA) of the cells, and the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names.</p>
@@ -217,6 +219,15 @@ suppressMessages(library(Lamian))</code></pre>
 ##  $ cellanno  :&#39;data.frame&#39;:  2000 obs. of  2 variables:
 ##   ..$ cell  : chr [1:2000] &quot;BM2:50:male_205626&quot; &quot;BM4:29:male_164021&quot; &quot;BM3:39:male_104439&quot; &quot;BM3:39:male_93578&quot; ...
 ##   ..$ sample: chr [1:2000] &quot;BM2&quot; &quot;BM4&quot; &quot;BM3&quot; &quot;BM3&quot; ...</code></pre>
+</div>
+<div id="use-the-seurat-object" class="section level4">
+<h4>Use the Seurat object</h4>
+<p>If your data is a Seurat object, the most straightforward way is to extract the slots of PCA, gene expression matrix (before integration), etc..</p>
+</div>
+<div id="use-the-hdf5-format" class="section level4">
+<h4>Use the HDF5 format</h4>
+<p>Please see below Module 3 and 4 for more details if you have an ultra large data and it is in the HDF5 format.</p>
+</div>
 </div>
 <div id="infer-tree-structure" class="section level3">
 <h3>Infer tree structure</h3>

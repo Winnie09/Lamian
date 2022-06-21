@@ -25,8 +25,8 @@ maintainer:
       - "whou10@jhu.edu"
 package: Lamian
 output: 
-  html_document:
   pdf_document: default
+  html_document:
   df_print: paged
 vignette: >
   %\VignetteIndexEntry{1. Lamian package}
@@ -65,6 +65,8 @@ The module 1 of Lamian is designed for detecting the stability of branches in a 
 
 ### Data preparation
 
+#### Use the matrix/dataframe/list format
+
 We will need a gene by cell expression matrix, the low-dimension representation of the cells, and the cell annotation (which sample each cell belongs to). Here, we use example data **hca_bm_saver**, **hca_bm_pca**, **hca_bm_cellanno** to demonstrate their data structures. Users can read in their own data of interest in this step.
 
 ```{r}
@@ -75,6 +77,14 @@ data(man_tree_data)
 ```{r}
 str(man_tree_data)
 ```
+
+
+#### Use the Seurat object
+If your data is a Seurat object, the most straightforward way is to extract the slots of PCA, gene expression matrix (before integration), etc..
+
+#### Use the HDF5 format
+Please see below Module 3 and 4 for more details if you have an ultra large data and it is in the HDF5 format. 
+
 
 ### Infer tree structure
 
