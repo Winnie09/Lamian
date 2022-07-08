@@ -27,7 +27,7 @@ plotClusterMean <- function(testobj,
   }
   if ('cluster' %in% names(testobj))
     cluster <- testobj[['cluster']]
-  if (type == 'variable') {
+  if (toupper(type) == 'VARIABLE') {
     int <- intersect(rownames(fit[[1]]), names(cluster))
     clu <- cluster[int]
     pd <- lapply(seq_len(length(fit)), function(i) {
@@ -47,14 +47,16 @@ plotClusterMean <- function(testobj,
                                     size = 1) +
       theme_classic() +
       theme(axis.text.x = element_blank()) +
-      facet_wrap( ~ cluster)
+      facet_wrap( ~cluster, scale = 'free') + 
+      xlab('Pseudotime') + 
+      ylab('Expression')
     if (length(unique(pd$type)) < 8) {
       p <- p + scale_color_brewer(palette = 'Dark2')
     } else {
       p <-
         p + scale_color_manual(values = grDevices::colorRampPalette(brewer.pal(8, 'Dark2'))(length(unique(pd$type))))
     }
-  } else if (type == 'time') {
+  } else if (toupper(type) == 'TIME') {
     int <- intersect(rownames(fit), names(cluster))
     clu <- cluster[int]
     mat <- fit[int,]

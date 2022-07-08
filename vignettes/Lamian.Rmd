@@ -1,41 +1,48 @@
 ---
-title: "Lamian: a statistical framework for differential pseudotime analysis in multiple single-cell RNA-seq samples"
-author: 
-  - name: Wenpin Hou
-    affiliation: 
-      - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
-  - name: Zhicheng Ji
-    affiliation: 
-      - &id2 "Department of Biostatistics and Bioinformatics, Duke University School of Medicine"
-  - name: Zeyu Chen
-    affiliation: 
-      - &id3 "Department of Systems Pharmacology and Translational Therapeutics, Perelman School of Medicine, University of Pennsylvania"
-  - name: E. John Wherry
-    affiliation: 
-      - &id2 "Department of Systems Pharmacology and Translational Therapeutics, Perelman School of Medicine, University of Pennsylvania"
-  - name: Stephanie C. Hicks\*
-    affiliation: 
-      - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
-  - name: Hongkai Ji\*
-    affiliation: 
-      - &id1 "Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University"
-maintainer:
-  - name: Wenpin Hou
-    email: 
-      - "whou10@jhu.edu"
-package: Lamian
-output: 
-  pdf_document: default
+title: 'Lamian: a statistical framework for differential pseudotime analysis in multiple
+  single-cell RNA-seq samples'
+author:
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
+    Hopkins University
+  name: Wenpin Hou
+- affiliation: Department of Biostatistics and Bioinformatics, Duke University School
+    of Medicine
+  name: Zhicheng Ji
+- affiliation: Department of Systems Pharmacology and Translational Therapeutics,
+    Perelman School of Medicine, University of Pennsylvania
+  name: Zeyu Chen
+- affiliation: Department of Systems Pharmacology and Translational Therapeutics,
+    Perelman School of Medicine, University of Pennsylvania
+  name: E. John Wherry
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
+    Hopkins University
+  name: Stephanie C. Hicks\*
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
+    Hopkins University
+  name: Hongkai Ji\*
+output:
   html_document:
-  df_print: paged
-vignette: >
-  %\VignetteIndexEntry{1. Lamian package}
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  pdf_document: default
+  rmarkdown::html_document:
+    toc: yes
+    toc_depth: 3
+package: Lamian
+maintainer:
+- email: whou10@jhu.edu
+  name: Wenpin Hou
+vignette: |
+  %\VignetteIndexEntry{1. Lamian package} %\VignetteEncoding{UTF-8} %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(
+  fig.pos = "!h", out.extra = "",
+  fig.align = "center"
+)
 ```
 
 # Overview

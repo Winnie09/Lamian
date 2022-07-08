@@ -23,7 +23,8 @@ clusterGene <- function(testobj, gene, type = 'variable', k.auto = FALSE, k=5, m
                         gene = gene,
                         k = k,
                         type = type,
-                        method = method)
+                        method = method,
+                        scale.difference = scale.difference)
   } else if (toupper(type) == 'VARIABLE'){
     if ('XDEType' %in% names(testobj)){
       XDEType <- testobj$XDEType
