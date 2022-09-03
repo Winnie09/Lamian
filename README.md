@@ -13,8 +13,7 @@ We develop a systematic computational and statistical framework, Lamian, for mul
 ![Lamian framework](vignettes/figure1.jpeg)
 
 ## NEWS
-We are systematically testing a new version which is significantly more computationally efficient. For example, we incorporated the HDF5 files as the input and also, as requested by some users, Seurat objects as the inputs. The new version can complete the TDE and XDE tests on 300k cells for 2-3 days. We will also release a new section in the user manual for longitudinal study design. The new version is expected to be released in March 2022. Please contact Dr. Wenpin Hou at <whou10@jhu.edu> if you need the codes now. 
-
+We are systematically testing a new version which is significantly more computationally efficient. For example, we incorporated the HDF5 files as the input and also, as requested by some users, Seurat objects as the inputs. The new version can complete the TDE and XDE tests on 300k cells for 2-3 days. We will also release a new section in the user manual for longitudinal study design. We will update the package when the new version is ready to be released. Please contact Dr. Wenpin Hou at <whou10@jhu.edu> if you need the codes now. 
 
 ## Lamian Installation
 
@@ -68,6 +67,8 @@ vignette('Lamian')
 A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples. 
 Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks\*, Hongkai Ji\*. 
 bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
+
+This manuscript is now under revision in a peer-review journal.
 
 ## Contact
 
