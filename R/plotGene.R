@@ -55,11 +55,12 @@ plotGene <-
     pseudotime <- testobj[['pseudotime']]
     cellanno <- testobj[['cellanno']]
     colnames(cellanno) <- c('Cell', 'Sample')
-    if ('expr.ori' %in% names(testobj))
-      expression <-
-      testobj[['expr.ori']]
-    else
+    if ('expr.ori' %in% names(testobj)){
+      expression <- testobj[['expr.ori']]
+    } else{
       expression <- testobj[['expr']]
+    }
+      
     if (cellProp) {
       ptw <-
         cut(pseudotime,
@@ -100,18 +101,22 @@ plotGene <-
       Sample = as.character(cellanno[, 2]),
       stringsAsFactors = FALSE
     )
-    variable.d <- if (is.null(variable))
-      1
-    else
-      variable
+    if (is.null(variable)){
+     variable.d <- 1
+    } else {
+     variable.d <- variable
+    }
+      
     if (!is.null(variable.text) & variable.d != 1) {
       design[, variable.d] <-
         ifelse(design[, variable.d] == 0, variable.text[1], variable.text[2])
     }
-    a <- if (free.scale)
-      'free'
-    else
-      'fixed'
+    if (free.scale){
+      a <- 'free'
+    } else{
+      a <- 'fixed'
+    }
+      
     if (length(gene) == 1) {
       print('plotting one gene ...')
       pd <- data.frame(

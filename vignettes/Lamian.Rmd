@@ -2,14 +2,12 @@
 title: 'Lamian: a statistical framework for differential pseudotime analysis in multiple
   single-cell RNA-seq samples'
 author:
-- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
-    Hopkins University
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University
   name: Wenpin Hou
 - affiliation: Department of Biostatistics and Bioinformatics, Duke University School
     of Medicine
   name: Zhicheng Ji
-- affiliation: Department of Systems Pharmacology and Translational Therapeutics,
-    Perelman School of Medicine, University of Pennsylvania
+- affiliation: Department of Systems Pharmacology and Translational Therapeutics, Perelman School of Medicine, University of Pennsylvania
   name: Zeyu Chen
 - affiliation: Department of Systems Pharmacology and Translational Therapeutics,
     Perelman School of Medicine, University of Pennsylvania
@@ -437,4 +435,4 @@ bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
 
 # Maintaince or issue reports
 
-Should you encounter any bugs or have any suggestions, please feel free to contact Wenpin Hou <whou10@jhu.edu>, or open an issue on the Github page https://github.com/Winnie09/Lamian/issues. 
+Should you encounter any bugs or have any suggestions, please feel free to contact Wenpin Hou <wh2526@cumc.columbia.edu>, or open an issue on the Github page https://github.com/Winnie09/Lamian/issues. 

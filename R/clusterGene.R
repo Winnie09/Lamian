@@ -12,19 +12,20 @@
 #' @param type A character denoting the population fit is on "Time" or "Variable".  Default is "Time". Case insensitive. 
 #' @param k.auto logical. If FALSE (default), users need to specify k as the number of clusters. If TRUE, k will be automatically determined by elbow's method.
 #' @param k a numeric number. The number of clusters. Only useful when k.auto = FALSE.
-#' @param method the clustering method. Options include 'kmeans'(default), 'hierarchical', 'louvain', and 'GMM'. Note: "GMM" is very slow. 
+#' @param method the clustering method. Options include 'kmeans'(default), 'hierarchical', 'louvain', and 'GMM'.  "kmeans" (default) for k-means clustering,  "hierarchical" for hierarchical clustering, "louvain" for Louvain clustering, and "GMM" for Model-based clustering. Note: "GMM" is very slow. 
 #' @param scale.difference logical. If FALSE, then do not standarize the group difference, but only scale by the maximum value of the group difference absolute values. If TRUE, then standardize the group difference before doing the clustering.
 #' @examples
 #' data(mantestobj)
 #' clu = clusterGene(testobj = mantestobj, k = 4)
-clusterGene <- function(testobj, gene, type = 'variable', k.auto = FALSE, k=5, method = 'kmeans', scale.difference = F){
+clusterGene <- function(testobj, gene, type = 'variable', k.auto = FALSE, k=5, method = 'kmeans', scale.difference = F, seed = 12345){
   if (toupper(type) == 'TIME'){
     clu <- cluster_gene(testobj = testobj, 
                         gene = gene,
                         k = k,
                         type = type,
                         method = method,
-                        scale.difference = scale.difference)
+                        scale.difference = scale.difference,
+                        seed = seed)
   } else if (toupper(type) == 'VARIABLE'){
     if ('XDEType' %in% names(testobj)){
       XDEType <- testobj$XDEType
@@ -32,7 +33,7 @@ clusterGene <- function(testobj, gene, type = 'variable', k.auto = FALSE, k=5, m
       XDEType <- getXDEType(testobj)
     }
     
-    clu <- cluster_gene(testobj, gene = names(XDEType)[!XDEType %in% c('nonXDE', 'meanSig')], type = 'variable', k=k, scale.difference = scale.difference, method = method, k.auto = k.auto)
+    clu <- cluster_gene(testobj, gene = names(XDEType)[!XDEType %in% c('nonXDE', 'meanSig')], type = 'variable', k=k, scale.difference = scale.difference, method = method, k.auto = k.auto, seed = seed)
     design = testobj$design
     cellanno = testobj$cellanno
     meandiff <- sapply(c(0,1), function(i){

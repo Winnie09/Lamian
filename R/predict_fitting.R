@@ -13,10 +13,12 @@ predict_fitting <-
            test.type = 'time') {
     ## make the cells order according to pseudotime order
     ## fitting
-    if ('expr.ori' %in% names(testObj))
+    if ('expr.ori' %in% names(testObj)){
       expr <- testObj$expr.ori
-    else
+    } else {
       expr <- testObj$expr
+    }
+      
     knotnum = testObj$knotnum[gene]
     design = testObj$design
     cellanno = testObj$cellanno
@@ -99,11 +101,12 @@ predict_fitting <-
     })
     pred <- do.call(rbind, pred)
     pred <- pred[gene, colnames(expr), drop = FALSE]
-    if ('populationFit' %in% names(testObj))
+    if ('populationFit' %in% names(testObj)){
       populationFit = testObj$populationFit
-    else
-      populationFit <-
-      getPopulationFit(testObj, gene, type = testObj$test.type)
+    } else{
+      populationFit <- getPopulationFit(testObj, gene, type = testObj$test.type)
+    }
+      
     if (toupper(test.type) == 'TIME') {
       return(pred + populationFit[gene, , drop = FALSE])
     } else {

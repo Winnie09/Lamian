@@ -10,7 +10,7 @@
 #' @param k a numeric number. The number of clusters. Only useful when k.auto = FALSE.
 #' @param k.auto logical. If FALSE (default), users need to specify k as the number of clusters. If TRUE, k will be automatically determined by elbow's method.
 #' @param type One of c('Time', 'Variable').
-#' @param method the clustering method, either "kmeans" for k-means clustering or "hierarchical" for hierarchical clustering.
+#' @param method The clustering method. "kmeans" (default) for k-means clustering,  "hierarchical" for hierarchical clustering, "louvain" for Louvain clustering, and "GMM" for Model-based clustering.
 #' @param scale.difference logical. If FALSE, then do not standarize the group difference, but only scale by the maximum value of the group difference absolute values. If TRUE, then standardize the group difference before doing the clustering.
 cluster_gene <- function(testobj, 
                          gene,
@@ -18,7 +18,8 @@ cluster_gene <- function(testobj,
                          k.auto = FALSE,
                          type = 'Time',
                          method = 'kmeans', 
-                         scale.difference = F){
+                         scale.difference = F,
+                         seed = 12345){
   if (toupper(type) == 'TIME'){ 
     if ('populationFit' %in% names(testobj)) {
       fit <- testobj$populationFit
@@ -40,7 +41,7 @@ cluster_gene <- function(testobj,
   }
   
   if (method == 'kmeans'){
-    set.seed(12345)
+    set.seed(seed)
     # 
     if (k.auto){
       clu <- mykmeans(mat.scale, maxclunum = 20)$cluster
@@ -66,7 +67,7 @@ cluster_gene <- function(testobj,
   } else if (method == 'GMM'){
     samplen = 2e2
     colnames(mat.scale) = paste0('cell', seq(1, ncol(mat.scale)))
-    set.seed(12345)
+    set.seed(seed)
     sampid = sample(1:ncol(mat.scale), samplen)
     if (nrow(mat.scale) > samplen){
       res <- mclust::Mclust(data = mat.scale[, sampid], G = k, modelNames = 'EII', verbose = FALSE)

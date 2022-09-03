@@ -34,7 +34,8 @@ infer_tree_structure <-
            plotdir = NA,
            xlab = 'PC1',
            ylab = 'PC2',
-           max.clunum = 50) {
+           max.clunum = 50,
+           kmeans.seed = 12345) {
     alls <- cellanno[, 2]
     names(alls) <- cellanno[, 1]
     ## set.seed(12345)
@@ -49,7 +50,7 @@ infer_tree_structure <-
     
     ## clustering
     clu <-
-      mykmeans(pr, maxclunum = 50, number.cluster = number.cluster)$cluster
+      mykmeans(pr, maxclunum = 50, number.cluster = number.cluster, seed = kmeans.seed)$cluster
     table(clu)
     pd = data.frame(x = pr[, 1],
                     y = pr[, 2],
@@ -59,6 +60,9 @@ infer_tree_structure <-
       pdf(paste0(plotdir, 'cluster.pdf'),
           width = 3,
           height = 2.1)
+        # pdf(paste0(plotdir, 'cluster.pdf'),
+        #   width = 6,
+        #   height = 4.2)
       print(
         ggplot(data = pd, aes(
           x = pd[,1], y = pd[,2], color = pd[,3]

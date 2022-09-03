@@ -73,7 +73,7 @@ getPopulationFit <- function(testobj,
       phi <- bs(pt,knots = knots, intercept = TRUE)
     }
     
-    if (exists('variable')) {
+    if (type == 'VARIABLE') {
       fit <- lapply(x, function(i) {
         if (ncol(phi) == nrow(i)){
           phi %*% i %*% beta
