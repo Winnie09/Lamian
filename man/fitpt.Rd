@@ -47,7 +47,7 @@ This function is used to perform the model fitting.
 }
 \examples{
 data(mandata)
-a = fitpt(expr = mandata$expr, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, verbose.output=FALSE, ncores=1, model = 1)
+a = fitpt(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, ncores=1, model = 1)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

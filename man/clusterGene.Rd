@@ -11,7 +11,8 @@ clusterGene(
   k.auto = FALSE,
   k = 5,
   method = "kmeans",
-  scale.difference = F
+  scale.difference = F,
+  seed = 12345
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ clusterGene(
 
 \item{k}{a numeric number. The number of clusters. Only useful when k.auto = FALSE.}
 
-\item{method}{the clustering method. Options include 'kmeans'(default), 'hierarchical', 'louvain', and 'GMM'. Note: "GMM" is very slow.}
+\item{method}{the clustering method. Options include 'kmeans'(default), 'hierarchical', 'louvain', and 'GMM'.  "kmeans" (default) for k-means clustering,  "hierarchical" for hierarchical clustering, "louvain" for Louvain clustering, and "GMM" for Model-based clustering. Note: "GMM" is very slow.}
 
 \item{scale.difference}{logical. If FALSE, then do not standarize the group difference, but only scale by the maximum value of the group difference absolute values. If TRUE, then standardize the group difference before doing the clustering.}
 }

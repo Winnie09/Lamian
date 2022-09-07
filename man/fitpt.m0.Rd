@@ -34,7 +34,7 @@ This function is used to perform the model 0 (beta0 for intercept base only) fit
 }
 \examples{
 data(mandata)
-a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10, verbose=FALSE)
+a = fitpt.m0(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, EMmaxiter=5, EMitercutoff=10)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

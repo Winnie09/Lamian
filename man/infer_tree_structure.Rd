@@ -14,7 +14,8 @@ infer_tree_structure(
   plotdir = NA,
   xlab = "PC1",
   ylab = "PC2",
-  max.clunum = 50
+  max.clunum = 50,
+  kmeans.seed = 12345
 )
 }
 \arguments{

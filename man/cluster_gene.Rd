@@ -11,7 +11,8 @@ cluster_gene(
   k.auto = FALSE,
   type = "Time",
   method = "kmeans",
-  scale.difference = F
+  scale.difference = F,
+  seed = 12345
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ cluster_gene(
 
 \item{type}{One of c('Time', 'Variable').}
 
-\item{method}{the clustering method, either "kmeans" for k-means clustering or "hierarchical" for hierarchical clustering.}
+\item{method}{The clustering method. "kmeans" (default) for k-means clustering,  "hierarchical" for hierarchical clustering, "louvain" for Louvain clustering, and "GMM" for Model-based clustering.}
 
 \item{scale.difference}{logical. If FALSE, then do not standarize the group difference, but only scale by the maximum value of the group difference absolute values. If TRUE, then standardize the group difference before doing the clustering.}
 }
