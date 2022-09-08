@@ -3,7 +3,7 @@
 ### Wenpin Hou, Zhicheng Ji, Zeyu Chen, E. John Wherry, Stephanie C. Hicks\*, Hongkai Ji\*
 ====
 
-<img src="https://github.com/Winnie09/Lamian/blob/master/vignettes/logo.png"  width = "220">
+<img src="https://github.com/Winnie09/Lamian/blob/master/vignettes/logo.png"  width = "150">
 
 ## Lamian Installation
 
