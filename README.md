@@ -3,17 +3,7 @@
 ### Wenpin Hou, Zhicheng Ji, Zeyu Chen, E. John Wherry, Stephanie C. Hicks\*, Hongkai Ji\*
 ====
 
-![Lamian](vignettes/lamian.jpeg)
-
-## Introductions
-Pseudotime analysis based on single-cell RNA-seq (scRNA-seq) data has been widely used to study dynamic gene regulatory programs along continuous biological processes such as cell differentiation, immune responses, and disease development. Existing pseudotime analysis methods primarily address the issue of reconstructing cellular pseudotemporal trajectories and inferring gene expression changes along the reconstructed trajectory in one biological sample. As scRNA-seq studies are increasingly performed on multiple patient samples, comparing gene expression dynamics across samples has been emerging as a new demand for which a systematic analytical solution is lacking. 
-
-We develop a systematic computational and statistical framework, Lamian, for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cellular pseudotemporal trajectory, evaluate the uncertainty of the trajectory branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression. Importantly, when identifying cell abundance or gene expression changes associated with pseudotime and sample covariates, Lamian accounts for variability across biological samples which other existing pseudotime methods do not consider. As a result, Lamian is able to more appropriately control the false discovery rate (FDR) when analyzing multi-sample data, a property not offered by any other methods. 
-
-![Lamian framework](vignettes/figure1.jpeg)
-
-## NEWS
-We are systematically testing a new version which is significantly more computationally efficient. For example, we incorporated the HDF5 files as the input and also, as requested by some users, Seurat objects as the inputs. The new version can complete the TDE and XDE tests on 300k cells for 2-3 days. We will also release a new section in the user manual for longitudinal study design. We will update the package when the new version is ready to be released. Please contact Dr. Wenpin Hou at <whou10@jhu.edu> if you need the codes now. 
+<img src="https://github.com/Winnie09/Lamian/tree/master/vignettes/logo.png"  width = "220">
 
 ## Lamian Installation
 
@@ -46,10 +36,14 @@ devtools::install_github("zji90/TSCAN")
 devtools::install_github("Winnie09/Lamian")
 ```
 
-
-
 If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below).
 
+
+### Note: If you encounter difficulties in installing the R package "ComplexHeatmap", then you can download the folder and remove the "ComplexHeatmap" in the DESCRIPTION file "Imports:" list to avoid installing it. And then you run the following lines in terminal (outside the repository "Lamian"):
+```{r}
+R CMD BUILD Lamian
+R CMD INSTALL R CMD INSTALL Lamian_0.99.0.tar.gz
+``
 
 ## User Manual
 You may use any of the following ways to access user manual:
@@ -62,15 +56,24 @@ suppressMessages(library(Lamian))
 vignette('Lamian')
 ```
 
+![Lamian](vignettes/lamian.jpeg)
+
+## Introductions
+Pseudotime analysis based on single-cell RNA-seq (scRNA-seq) data has been widely used to study dynamic gene regulatory programs along continuous biological processes such as cell differentiation, immune responses, and disease development. Existing pseudotime analysis methods primarily address the issue of reconstructing cellular pseudotemporal trajectories and inferring gene expression changes along the reconstructed trajectory in one biological sample. As scRNA-seq studies are increasingly performed on multiple patient samples, comparing gene expression dynamics across samples has been emerging as a new demand for which a systematic analytical solution is lacking. 
+
+We develop a systematic computational and statistical framework, Lamian, for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cellular pseudotemporal trajectory, evaluate the uncertainty of the trajectory branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression. Importantly, when identifying cell abundance or gene expression changes associated with pseudotime and sample covariates, Lamian accounts for variability across biological samples which other existing pseudotime methods do not consider. As a result, Lamian is able to more appropriately control the false discovery rate (FDR) when analyzing multi-sample data, a property not offered by any other methods. 
+
+![Lamian framework](vignettes/figure1.jpeg)
+
 ## Citation 
 
 A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples. 
 Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks\*, Hongkai Ji\*. 
-bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
+bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910. 
 
 This manuscript is now under revision in a peer-review journal.
 
 ## Contact
 
-Should you encounter any bugs or have any suggestions, please feel free to contact Wenpin Hou <whou10@jhu.edu>, or open an issue on the Github page https://github.com/Winnie09/Lamian/issues.
+Should you encounter any bugs or have any suggestions, please feel free to contact Wenpin Hou <wh2526@cumc.columbia.edu>, or open an issue on the Github page https://github.com/Winnie09/Lamian/issues.
 
