@@ -39,7 +39,9 @@ devtools::install_github("Winnie09/Lamian")
 If there is any problem with the installation process, please make sure you have R version at least 3.5.x and you have installed Rtools (Windows users) or clang (mac users). If the problem still occurs, please contact the author (see below).
 
 
-### Note: If you encounter difficulties in installing the R package "ComplexHeatmap", then you can download the folder and remove the "ComplexHeatmap" in the DESCRIPTION file "Imports:" list to avoid installing it. And then you run the following lines in terminal (outside the repository "Lamian"):
+### Trouble shooting:
+
+If you encounter difficulties in installing the R package "ComplexHeatmap", then you can download the folder and remove the "ComplexHeatmap" in the DESCRIPTION file "Imports:" list to avoid installing it (the function to plot heatmap will not work in this case). And then you run the following lines in terminal (outside the repository "Lamian"):
 ```{r}
 R CMD BUILD Lamian
 R CMD INSTALL R CMD INSTALL Lamian_0.99.0.tar.gz
