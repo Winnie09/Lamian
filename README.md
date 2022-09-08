@@ -45,7 +45,7 @@ If you encounter difficulties in installing the R package "ComplexHeatmap", then
 ```{r}
 R CMD BUILD Lamian
 R CMD INSTALL R CMD INSTALL Lamian_0.99.0.tar.gz
-``
+```
 
 ## User Manual
 You may use any of the following ways to access user manual:
