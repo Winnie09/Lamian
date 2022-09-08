@@ -41,7 +41,7 @@ If there is any problem with the installation process, please make sure you have
 
 ### Trouble shooting:
 
-If you encounter difficulties in installing the R package "ComplexHeatmap", then you can download the folder and remove the "ComplexHeatmap" in the DESCRIPTION file "Imports:" list to avoid installing it (the function to plot heatmap will not work in this case). And then you run the following lines in terminal (outside the repository "Lamian"):
+If you encounter difficulties in installing the R package "ComplexHeatmap", then you can download this Github folder and remove the "ComplexHeatmap" in the DESCRIPTION file "Imports:" list to avoid installing it. The function to plot heatmap will not work in this case, but other functions will still be working. And then you run the following lines in terminal (outside the repository "Lamian"):
 ```{r}
 R CMD BUILD Lamian
 R CMD INSTALL R CMD INSTALL Lamian_0.99.0.tar.gz
