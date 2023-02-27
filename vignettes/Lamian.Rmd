@@ -19,11 +19,11 @@ author:
     Hopkins University
   name: Hongkai Ji\*
 output:
+  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_depth: '3'
-  pdf_document: default
   rmarkdown::html_document:
     toc: yes
     toc_depth: 3
@@ -66,7 +66,7 @@ suppressMessages(library(Lamian))
 
 # Module 1: tree variability
 
-The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch's detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples' proportion in each branch. 
+The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch's detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples' proportion in each branch.
 
 ### Data preparation
 
@@ -78,7 +78,7 @@ We will need a gene by cell expression matrix, the low-dimension representation 
 data(man_tree_data)
 ```
 
-**man_tree_data** is a list containing gene by cell expression matrix, low-dimension representation (PCA) of the cells, and the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names. 
+**man_tree_data** is a list containing gene by cell expression matrix, low-dimension representation (PCA) of the cells, and the cell annotation where the first column are the cell names, the second column are the sample names, and the row names are the cell names.
 ```{r}
 str(man_tree_data)
 ```
@@ -88,19 +88,19 @@ str(man_tree_data)
 If your data is a Seurat object, the most straightforward way is to extract the slots of PCA, gene expression matrix (before integration), etc..
 
 #### Use the HDF5 format
-Please see below Module 3 and 4 for more details if you have an ultra large data and it is in the HDF5 format. 
+Please see below Module 3 and 4 for more details if you have an ultra large data and it is in the HDF5 format.
 
 
 ### Infer tree structure
 
 ```{r}
 set.seed(12345)
-res = infer_tree_structure(pca = man_tree_data[['pca']], 
-                           expression = man_tree_data[['expression']], 
-                           cellanno = man_tree_data[['cellanno']], 
-                           origin.marker = c('CD34'), 
+res = infer_tree_structure(pca = man_tree_data[['pca']],
+                           expression = man_tree_data[['expression']],
+                           cellanno = man_tree_data[['cellanno']],
+                           origin.marker = c('CD34'),
                            number.cluster = 5,
-                           xlab='Principal component 1', 
+                           xlab='Principal component 1',
                            ylab = 'Principal component 2')
 ```
 
@@ -112,14 +112,14 @@ names(res)
 ### Plot the tree structure
 
 ```{r fig_plotmclust, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
-Lamian::plotmclust(res, cell_point_size = 0.5, 
-                   x.lab = 'Principal component 1', 
+Lamian::plotmclust(res, cell_point_size = 0.5,
+                   x.lab = 'Principal component 1',
                    y.lab = 'Principal component 2')
 ```
 
 ### Evaluate the uncertainty of tree branches
 
-We can call the function **evaluate_uncertainty()** to evaluate the tree topology uncertainty. We suggested that users set **n.permute = 100** or more to ensure enough randomness to construct the null distribution, but here we set **n.permute = 5** in order to provide a simplified example. 
+We can call the function **evaluate_uncertainty()** to evaluate the tree topology uncertainty. We suggested that users set **n.permute = 100** or more to ensure enough randomness to construct the null distribution, but here we set **n.permute = 5** in order to provide a simplified example.
 
 ```{r}
 result <- evaluate_uncertainty(res, n.permute=5)
@@ -127,7 +127,7 @@ names(result)
 ```
 
 Since for the simplicity of the example we set **n.permute = 5** only, the branch proportions might not really make sense. When users set **n.permute = 100** or more in their real applications, results will make much more sense.
-The result is a list of three elements. The first selement is the detection rate of each branch. 
+The result is a list of three elements. The first selement is the detection rate of each branch.
 ```{r}
 result[[1]]
 ```
@@ -138,7 +138,7 @@ result[[2]]
 ```
 
 
-The thrid element is the sample proportion sd (standard deviation) information. 
+The thrid element is the sample proportion sd (standard deviation) information.
 ```{r}
 result[[3]]
 ```
@@ -165,18 +165,18 @@ branchPropTest(data = data, design = design)
 
 ### Gene expression in a matrix form
 
-In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any dataset of interest. 
+In the following, we will use an example dataset **expdata** of 100 genes and 1000 cells to demonstration the workflow. In practice, we can input any dataset of interest.
 
 ```{r}
 data(expdata)
 ```
 
-The inputs should contain: (a) **expr**: a gene by cell expression matrix. The entires are library-size-normalized log-transformed gene expression values. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out. 
+The inputs should contain: (a) **expr**: a gene by cell expression matrix. The entires are library-size-normalized log-transformed gene expression values. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out.
 ```{r}
 str(expdata$expr)
 ```
 
-(b) **cellanno**: a dataframe where the first column are cell names and second column are sample names. 
+(b) **cellanno**: a dataframe where the first column are cell names and second column are sample names.
 ```{r}
 head(expdata$cellanno)
 ```
@@ -186,7 +186,7 @@ head(expdata$cellanno)
 str(expdata$pseudotime)
 ```
 
-(d) **design**: a matrix or a data frame. The number of rows equals to the number of unique samples. Rownames are sample names. The number of columns depends on the number of sample covariates. The first column is the intercept (all 1s). The second column is the realization values of the first sample-level covariate (e.g. sample groups). Other columns are the realization values for other sample-level covariates. 
+(d) **design**: a matrix or a data frame. The number of rows equals to the number of unique samples. Rownames are sample names. The number of columns depends on the number of sample covariates. The first column is the intercept (all 1s). The second column is the realization values of the first sample-level covariate (e.g. sample groups). Other columns are the realization values for other sample-level covariates.
 ```{r}
 print(expdata$design)
 ```
@@ -196,18 +196,21 @@ The function `lamian.test()` is designed to perform multiple tests. To perform t
 
 ### Gene expression in hdf5 format (for ultra-large datasets)
 
-For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed at a faster speed. 
+For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed at a faster speed.
 
 To save the gene expression in hdf5 file format, we apply the following codes which creates a new file **data/multi.h5** (file *multi.h5* in the folder *data/* )
 ```{r eval=FALSE}
-saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
+saveh5(expr = expdata$expr, 
+       pseudotime = expdata$pseudotime, 
+       cellanno = expdata$cellanno, 
+       path = 'data/multi.h5')
 ```
 
 
 ### Perform XDE test
-We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**.  
+We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**.
 
-By default, **test.method = 'permutation'**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to save the running time. We recommend setting **permuiter = 100** or higher in real applications.  We also provide **test.method = 'chisq'**. 
+By default, **test.method = 'permutation'**. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** only to save the running time. We recommend setting **permuiter = 100** or higher in real applications.  We also provide **test.method = 'chisq'**.
 
 Here, we set **testvar = 2** to test the second column of the **design** matrix as the sample covariate while adjusting for other columns (except the intercept).
 
@@ -221,7 +224,9 @@ Res <- lamian_test(
   test.type = 'variable',
   testvar = 2,
   permuiter = 5,
-  ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  ## This is for permutation test only. 
+  ## We suggest that users use default permuiter = 100.
+  ## Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
   ncores = 1
 )
 ```
@@ -237,7 +242,9 @@ Res <- lamian_test_h5(
   test.type = 'variable',
   testvar = 2,
   permuiter = 5,
-  ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  ## This is for permutation test only. 
+  ## We suggest that users use default permuiter = 100.
+  ## Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
   ncores = 1
 )
 ```
@@ -294,18 +301,18 @@ plotClusterMeanAndDiff(Res)
 We can also plot the cluster difference seperately by calling `plotClusterDiff(testobj=Res, gene = diffgene)`.
 
 ### Downstream analysis 2: Gene ontology (GO) enrichment analysis
-We can further check out whether the XDE genes in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`. 
-Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. 
-In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`. 
+We can further check out whether the XDE genes in each cluster have any enriched genome functions by applying Gene Ontology (GO) analysis `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'variable')`.
+Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes.
+In practice, if there are significant GO terms in the clusters, we can generate a heatmap of the top GO terms using the command `plotGOEnrich(goRes = goRes)`.
 
 
 ## TDE test
 
 ### Data preparation
-The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered. 
+The inputs for Constant Time Test are the same as those for Sample Covariate Test (see above section), except that the **design** matrix can have only one intercept column. If there are more than one columns in **design**, only the first column will be considered.
 
 ### Perform TDE test
-Similar to the **XDE test**, we can perform the *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to save the running time. We recommend setting **permuiter = 100** or higher in real applications. 
+Similar to the **XDE test**, we can perform the *TDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**. The only difference is that **design** can be a one-column matrix or dataframe whose values are 1s. If there are multiple columns, only the first column will be actually used. The default permutation is 100, i.e. **permuiter = 100**, but in this small example we set it as **permuiter = 5** again to save the running time. We recommend setting **permuiter = 100** or higher in real applications.
 
 If the gene expression is in a matrix format,
 ```{r}
@@ -328,13 +335,16 @@ Res <- lamian_test_h5(
   design = expdata$design,
   test.type = 'time',
   permuiter = 5
-) ## this is for permutation test only. Alternatively, we can use test.method = 'chisq' to swich to the chi-square test. 
+  ## This is for permutation test only. 
+  ## We suggest that users use default permuiter = 100.
+  ## Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+)
 ```
 
 
 ### Downstream analysis 1: visualize and cluster TDE genes based on their multiple-sample temporal patterns
 
-The result object is a list containing multiple elements. The first element is a dataframe of statistics. 
+The result object is a list containing multiple elements. The first element is a dataframe of statistics.
 ```{r}
 head(Res$statistics)
 ```
@@ -376,7 +386,7 @@ plotClusterMean(testobj = Res,
 ```
 
 ### Downstream analysis 2: GO analysis for TDE genes
-Similar to **XDE test**, we can further proceed to identify the enriched GO terms for each gene cluster using commands `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')`. Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. In practice, if there are enriched GO terms, we can plot them using commands `plotGOEnrich(goRes = goRes)`. 
+Similar to **XDE test**, we can further proceed to identify the enriched GO terms for each gene cluster using commands `library(topGO); goRes <- GOEnrich(testobj = Res, type = 'time', sep = ':.*')`. Please note that there are no enriched GO terms in any of the clusters in this simplified example since we only subset 1,000 genes. In practice, if there are enriched GO terms, we can plot them using commands `plotGOEnrich(goRes = goRes)`.
 
 # Module 4: trajectory differential test based on cell composition
 
@@ -405,7 +415,7 @@ head(Res$statistics)
 
 ## XCD test
 
-The inputs are the same for XDE test (see above), except that we do not need gene expression matrix. 
+The inputs are the same for XDE test (see above), except that we do not need gene expression matrix.
 ```{r eval = TRUE}
 Res <-
   cellPropTest(
@@ -418,6 +428,109 @@ Res <-
   )
 ```
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
+
+
+# Apply other pseudotime inference methods in Lamian: take slingshot as an example
+**The uncertainty quantification of trajectory topology for other pseudotime methods is currently not supported in Lamian Modules 1 and 2** due to scalability issue (e.g. slingshot, which is another popular tree method similar to TSCAN but requires a more time-consuming principal curves fitting step), and/or technical complications in implementation (e.g. Monocle2, Monocle3, PhenoPath). **However, Lamian allows one the cellular pseudotime generated by other methods as input for downstream analyses in Modules 3 and 4.**  In the following, we take the pseudotime method `slingshot` as an example to demonstrate how to incoporate the pseudotime from another pseudotime method other than `TSCAN` to run Lamian's Module 3. 
+
+> Use slingshot to infer cellular pseudotime
+
+Load the data we prepared for this demo. It is subsetted from HCA-BM data.
+```{r}
+data(slingshot_data)
+```
+
+Load the package `slingshot` and its dependencies. Prepare the data objects, the low-dimentional representation (here we use principal components), and clusters.
+```{r}
+suppressMessages(library(slingshot))
+suppressMessages(library(SingleCellExperiment))
+suppressMessages(library(mclust))
+
+cnt <- slingshot_data$counts
+pca <- slingshot_data$pca
+sce <- SingleCellExperiment(assays = List(counts = cnt))
+reducedDims(sce) <- SimpleList(PCA = pca)
+cl1 <- Mclust(pca)$classification
+colData(sce)$GMM <- cl1
+```
+
+Run `slingshot()` to obtain cellcular pseudotime. At the same time, we check the running time using `system.time()`.
+```{r}
+system.time({
+  sce <- slingshot(sce, clusterLabels = 'GMM', reducedDim = 'PCA')
+})
+```
+
+**(Optional)** Plot slingshot's MST
+
+```{r fig_slingshotPseudotime, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
+library(RColorBrewer)
+plot(reducedDims(sce)$PCA, 
+     col = brewer.pal(9,'Set1')[sce$GMM], 
+     pch=16, 
+     asp = 1, 
+     xlab = 'Principal component 1', 
+     ylab = 'Principal component 2')
+lines(SlingshotDataSet(sce), lwd=2, type = 'lineages', col = 'black')
+```
+
+For example, we can visualize the first lineage `pseudotime_1` constructed by `slingshot`.
+```{r fig_slingshotCluster, fig.height = 5, fig.width = 5.5, fig.align = "center", out.width = '40%'}
+library(grDevices)
+colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(nrow(pca))
+plotcol <- colors[cut(sce$slingPseudotime_1, breaks=nrow(pca))]
+plot(reducedDims(sce)$PCA, 
+     col = plotcol, 
+     pch=16, 
+     asp = 1, 
+     xlab = 'Principal component 1', 
+     ylab = 'Principal component 2')
+lines(SlingshotDataSet(sce)@curves[[1]], lwd=2, col='black')
+```
+
+In  practice, users may select any interesting lineage. In the following, we suppose users are interested in the first lineage. We can then subset the cellular pseudotime in the first lineage. 
+```{r}
+pt <- sce$slingPseudotime_1
+names(pt) <- colnames(cnt) ## A vector with names is easier to handle in subsetting.
+```
+
+> The following steps are **important** when using any pseudotime inference methods, not only for slingshot's data. 
+
+First, check the cellcular pseudotime distribution. We can see that it contains `NA`, meaning that some cells do not have pseudotime, so we can't use these cells in the differential temporal analysis. We need to select the cells that have pseudotime.
+```{r}
+summary(pt)
+pt <- pt[!is.na(pt)] ## important
+selectedCell <- names(pt)
+```
+
+
+Second, check the numbers of cells in samples.  We can see that only the first five samples (BM1, BM2, BM3, BM4, BM5) have enough cells for downstream analyses. The remaining samples have less than 50 cells. Samples with too few cells will lead to low signal-to-noise ratio or even bugs in the program. We need to select the cells in the first five samples. 
+```{r}
+table(slingshot_data$cellanno[selectedCell, 2]) ## important
+sample <- slingshot_data$cellanno[selectedCell, 2]
+selectedSample <- c(paste0('BM', seq(1,5)))
+selectedCell2 <- selectedCell[sample %in% selectedSample]
+```
+
+> Now we can run Module 3 with slingshot's pseudotime.
+
+```{r}
+Res <- lamian_test(
+  expr = slingshot_data$expr[, selectedCell2],
+  cellanno = slingshot_data$cellanno[selectedCell2, ],
+  pseudotime = pt[selectedCell2],
+  design = slingshot_data$design[selectedSample,],
+  test.type = 'variable',
+  testvar = 2,
+  permuiter = 3,
+  ## This argument is for permutation test only. 
+  ## Alternatively, we can use test.method = 'chisq' to swich to the chi-square test where we dont' need this argument.
+  ## In permutation test, we suggest that users use default permuiter = 100. 
+  ncores = 1
+)
+```
+
+Analogously, we can use the above inputs to run **Module 4**. Since it is very straighforward, we won't go into details here.
 
 # Session Info
 
