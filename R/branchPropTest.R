@@ -21,7 +21,7 @@ branchPropTest <- function(data, design, method = 't.test') {
   }
   else if (method == 'multinom'){
     colnames(data) <- c('cell', 'branch', 'sample')
-    data$covariate <- design[match(rownames(data[,3]), rownames(design)), 2]
+    data$covariate <- design[match(data[,3], rownames(design)), 2]
     test <- nnet::multinom(branch ~ covariate, data = data)
     z <- summary(test)$coefficients/summary(test)$standard.errors
     p <- (1 - pnorm(abs(z), 0, 1)) * 2
