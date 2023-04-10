@@ -5,17 +5,23 @@
 #' @param inferobj the output object from function infer_tree_structure().
 #' @param n.permute: a numeric number of permutation in the permutation test.
 #' @param subset.cell a character vector of the names of the selected cells where boostrap will happen on. If NULL, then boostrap from all the cells.
+#' @param design a design matrix for performing branch proportion test. Each row is a sample. First column is intercept (all 1). Second column is covariate. 
+#' @param return.ctcomp if TRUE, return all branch proportion values of permutations. The default is FALSE. 
 #' @export
 #' @return a list of results
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @examples
 #' data(man_tree_res)
 #' a <- evaluate_uncertainty(inferobj = man_tree_res, n.permute = 3)
-evaluate_uncertainty <-
+evaluate_uncertainty <- 
   function(inferobj,
            n.permute,
            subset.cell = NULL,
-           design = NULL) {
+           design = NULL,
+           return.ctcomp = FALSE 
+           # branchPropTest.method = 'ttest', ## this is a quick way to call the t-test in branchPropTest(); however, if want to use the multinom test, call branchPropTest() separately. 
+           # branchPropTest.value.log = FALSE
+  ) {
     
     if (is.null(subset.cell)) {
       pr <- inferobj$pca
@@ -28,7 +34,7 @@ evaluate_uncertainty <-
     pt <- inferobj$pseudotime
     ord <- inferobj$order
     alls <- inferobj$allsample
-    ctcomplist <- reproduce.js <- reproduce.oc <- corr.score <- list()
+    ctcomplist.logit <- ctcomplist <- reproduce.js <- reproduce.oc <- corr.score <- list()
     for (pmid in seq(1, n.permute)) {
       ## boostrap cells
       ## set.seed(pmid)
@@ -37,8 +43,9 @@ evaluate_uncertainty <-
       pr.pm <- pr[bstid, ]
       
       ## cluster cells
-      clu <-
-        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster ###
+      invisible(capture.output(clu <-
+        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster))
+      
       
       ## build pseudotime
       mcl.pm <-
@@ -169,11 +176,11 @@ evaluate_uncertainty <-
       reproduce.oc[[pmid]] <- as.character(oc.melt[, 2])
       
       ## samples cell compositions
-      ctcomp.new <-
+      ctcomp.new.logit <- ctcomp.new <-
         matrix(0, nrow = length(unique(alls)), ncol = length(newbranch))
-      colnames(ctcomp.new) <-
+      colnames(ctcomp.new.logit) <- colnames(ctcomp.new) <-
         paste0('origin', seq(1, length(newbranch)))
-      rownames(ctcomp.new) <- unique(alls)
+      rownames(ctcomp.new.logit) <- rownames(ctcomp.new) <- unique(alls)
       
       if (nrow(js.melt) > 0) {
         ctcomp <-
@@ -186,12 +193,20 @@ evaluate_uncertainty <-
             ctcomp
           })
         colnames(ctcomp) <- paste0('origin', js.melt[, 2])
-        ctcomp <- ctcomp / rowSums(ctcomp)
         
-        ctcomp.new[rownames(ctcomp), colnames(ctcomp)] <-
-          ctcomp  ## sample by #branch: rowSums = 1  
+        ## if use logit values in t-test, then add a pseudocount of one
+        ## sample by #branch: in logit case, rowSums != 1
+        ctcomp.logit.tmp <- (ctcomp+1) / (rowSums(ctcomp)+1)
+        ctcomp.logit <- log(ctcomp.logit.tmp/(1-ctcomp.logit.tmp))
+        ctcomp.new.logit[rownames(ctcomp.logit), colnames(ctcomp.logit)] <- ctcomp.logit
+        
+        ## if use original composition values, sample by #branch: rowSums = 1
+        ctcomp <- ctcomp / rowSums(ctcomp)
+        ctcomp.new[rownames(ctcomp), colnames(ctcomp)] <-  ctcomp
       }
       ctcomplist[[pmid]] <- t(ctcomp.new)
+      ctcomplist.logit[[pmid]] <- t(ctcomp.new.logit)
+      
     }
     
     reproduce.js <- unlist(reproduce.js)
@@ -227,7 +242,8 @@ evaluate_uncertainty <-
       newbranch[as.numeric(sub('origin', '', rownames(sample.cellcomp.sd)))]
     
     if (!is.null(design)) {
-      dv <- as.numeric(as.factor(design[colnames(ctcomplist[[1]]), ])) - 1
+      ## t-test on original composition values
+      dv <- as.numeric(as.factor(design[colnames(ctcomplist[[1]]), 2])) - 1
       sample.cellcomp.pvalue <-
         sapply(ctcomplist, function(i)
           apply(i, 1, function(j) {
@@ -241,6 +257,21 @@ evaluate_uncertainty <-
         rowMeans(sample.cellcomp.pvalue < 0.05)
       names(sample.cellcomp.pvalue) <-
         newbranch[as.numeric(sub('origin', '', names(sample.cellcomp.pvalue)))]
+      
+      ## t-test on logit-transformed composition values
+      sample.cellcomp.logit.pvalue <-
+        sapply(ctcomplist.logit, function(i)
+          apply(i, 1, function(j) {
+            if (length(unique(j)) == 1) {
+              1
+            } else {
+              t.test(j[dv == 1], j[dv == 0])$p.value
+            }
+          }))
+      sample.cellcomp.logit.pvalue <-
+        rowMeans(sample.cellcomp.logit.pvalue < 0.05)
+      names(sample.cellcomp.logit.pvalue) <-
+        newbranch[as.numeric(sub('origin', '', names(sample.cellcomp.logit.pvalue)))]
     }
     
     if (length(newbranch[[length(newbranch)]]) == 2) {
@@ -256,7 +287,8 @@ evaluate_uncertainty <-
         detection.rate = detection.rate,
         sample.cellcomp.mean = sample.cellcomp.mean,
         sample.cellcomp.sd = sample.cellcomp.sd,
-        sample.cellcomp.pvalue = sample.cellcomp.pvalue
+        sample.cellcomp.pvalue = sample.cellcomp.pvalue,
+        sample.cellcomp.logit.pvalue = sample.cellcomp.logit.pvalue
       )
     } else {
       result <- list(
@@ -265,5 +297,11 @@ evaluate_uncertainty <-
         sample.cellcomp.sd = sample.cellcomp.sd
       )
     }
+    if (return.ctcomp == TRUE){
+      result[['branchProp']] = ctcomplist
+      result[['branchProp.logit']] = ctcomplist.logit
+      
+    }
     return(result)
   }
+

@@ -4,12 +4,22 @@
 \alias{evaluate_uncertainty}
 \title{Evaluate the pseudotime tree uncertainty}
 \usage{
-evaluate_uncertainty(inferobj, n.permute, subset.cell = NULL, design = NULL)
+evaluate_uncertainty(
+  inferobj,
+  n.permute,
+  subset.cell = NULL,
+  design = NULL,
+  return.ctcomp = FALSE
+)
 }
 \arguments{
 \item{inferobj}{the output object from function infer_tree_structure().}
 
 \item{subset.cell}{a character vector of the names of the selected cells where boostrap will happen on. If NULL, then boostrap from all the cells.}
+
+\item{design}{a design matrix for performing branch proportion test. Each row is a sample. First column is intercept (all 1). Second column is covariate.}
+
+\item{return.ctcomp}{if TRUE, return all branch proportion values of permutations. The default is FALSE.}
 
 \item{n.permute:}{a numeric number of permutation in the permutation test.}
 }
