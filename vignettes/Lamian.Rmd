@@ -12,24 +12,23 @@ author:
 - affiliation: Department of Systems Pharmacology and Translational Therapeutics,
     Perelman School of Medicine, University of Pennsylvania
   name: E. John Wherry
-- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
-    Hopkins University
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University
   name: Stephanie C. Hicks\*
-- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns
-    Hopkins University
+- affiliation: Deparment of Biostatistics, Bloomberg School of Public Health, Johns Hopkins University
   name: Hongkai Ji\*
+date: '`r format(Sys.time(), "%d %B , %Y")`'
 output:
-  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_depth: '3'
+  pdf_document: default
   rmarkdown::html_document:
     toc: yes
     toc_depth: 3
 package: Lamian
-maintainer:
-- email: whou10@jhu.edu
+Maintainer:
+- email: wh2526@cumc.columbia.edu
   name: Wenpin Hou
 vignette: |
   %\VignetteIndexEntry{1. Lamian package} %\VignetteEncoding{UTF-8} %\VignetteEngine{knitr::rmarkdown}
@@ -282,8 +281,6 @@ Res$cluster <-
 
 We can also plot original expression values, model fitted expression values, and model-fitted group difference in three seperate heatmaps.
 ```{r fig_sct_plotDiffFitHm3, fig.height = 5, fig.width = 8, fig.align = "center", eval=TRUE}
-colnames(Res$populationFit[[1]]) <-
-  colnames(Res$populationFit[[2]]) <- colnames(Res$expr)
 plotXDEHm(
   Res,
   cellWidthTotal = 180,

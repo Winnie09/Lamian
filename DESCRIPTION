@@ -2,15 +2,15 @@ Package: Lamian
 Type: Package
 Title: a statistical framework for differential pseudotime analysis in
         multiple single-cell RNA-seq samples
-Version: 0.99.1
-Date: 2021-04-22
+Version: 0.99.2
+Date: 2023-06-17
 Description: lamian is a systematic computational and statistical framework for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cells' pseudotemporal trajectory, evaluate the uncertainty of the trajectory's branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression.
 biocViews: StatisticalMethod, Bayesian, TimeCourse, WorkflowStep,
         MultipleComparison, GeneExpression, SingleCell,
         DifferentialExpression
 Encoding: UTF-8
 License: GPL-2
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Imports: devtools, grid, ggplot2, gridExtra, grDevices, igraph,
         matrixcalc, Matrix, RColorBrewer, TSCAN, org.Hs.eg.db,

@@ -95,11 +95,11 @@ plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHe
     testobj$expr <- testobj$expr[, names(testobj$pseudotime)]
   }
   
-  if ('XDEType' %in% names(testobj)) {
-    XDEType <- testobj$XDEType
-  } else {
-    XDEType <- getXDEType(testobj)
-  }
+  # if ('XDEType' %in% names(testobj)) {
+  #   XDEType <- testobj$XDEType
+  # } else {
+  #   XDEType <- getXDEType(testobj)
+  # }
   
   fit.scale <- do.call(cbind, fit)
   fit.scale <- fit.scale[names(testobj$cluster), ]
