@@ -44,7 +44,7 @@ cluster_gene <- function(testobj,
     set.seed(seed)
     # 
     if (k.auto){
-      clu <- mykmeans(mat.scale, maxclunum = 20)$cluster
+      clu <- mykmeans(mat.scale, maxclunum = 20, ncores = ncores)$cluster
     } else {
       clu <- kmeans(mat.scale, k, iter.max = 1000)$cluster
     }

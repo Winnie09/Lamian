@@ -35,7 +35,8 @@ infer_tree_structure <-
            xlab = 'PC1',
            ylab = 'PC2',
            max.clunum = 50,
-           kmeans.seed = 12345) {
+           kmeans.seed = 12345,
+           ncores = detectCores()) {
     alls <- cellanno[, 2]
     names(alls) <- cellanno[, 1]
     ## set.seed(12345)
@@ -50,7 +51,7 @@ infer_tree_structure <-
     
     ## clustering
     clu <-
-      mykmeans(pr, maxclunum = 50, number.cluster = number.cluster, seed = kmeans.seed)$cluster
+      mykmeans(pr, maxclunum = 50, number.cluster = number.cluster, seed = kmeans.seed, ncores = ncores)$cluster
     table(clu)
     pd = data.frame(x = pr[, 1],
                     y = pr[, 2],

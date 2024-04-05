@@ -18,7 +18,8 @@ evaluate_uncertainty <-
            n.permute,
            subset.cell = NULL,
            design = NULL,
-           return.ctcomp = FALSE 
+           return.ctcomp = FALSE,
+           ncores = detectCores()
            # branchPropTest.method = 'ttest', ## this is a quick way to call the t-test in branchPropTest(); however, if want to use the multinom test, call branchPropTest() separately. 
            # branchPropTest.value.log = FALSE
   ) {
@@ -44,7 +45,7 @@ evaluate_uncertainty <-
       
       ## cluster cells
       invisible(capture.output(clu <-
-        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster))
+        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster), ncores = ncores)
       
       
       ## build pseudotime
