@@ -5,7 +5,7 @@
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @return a list
 #' @export
-#' @import TSCAN scattermore RColorBrewer grDevices
+#' @import TSCAN scattermore RColorBrewer grDevices parallel
 #' @importFrom grDevices pdf
 #' @importFrom grDevices dev.off
 #' @param  pca cell by principal component (pc) matrix. Principal components reduction of the cells.

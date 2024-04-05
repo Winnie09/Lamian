@@ -2,7 +2,7 @@
 #'
 #' This function is used to support the external function clusterGene(). cluster genes based on their temporal patterns  of gene expression (constant time test) or the temporal patterns of gene expression group difference (sample covariate test).
 #'
-#' @import ggplot2 RColorBrewer splines gridExtra viridis
+#' @import ggplot2 RColorBrewer splines gridExtra viridis parallel
 #' @return a plot
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @param testobj object returned from lamian.test().
@@ -19,7 +19,8 @@ cluster_gene <- function(testobj,
                          type = 'Time',
                          method = 'kmeans', 
                          scale.difference = F,
-                         seed = 12345){
+                         seed = 12345,
+                         ncores = detectCores()){
   if (toupper(type) == 'TIME'){ 
     if ('populationFit' %in% names(testobj)) {
       fit <- testobj$populationFit
