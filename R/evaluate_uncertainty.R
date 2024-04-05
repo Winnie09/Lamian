@@ -2,6 +2,7 @@
 #'
 #' This function is designed to evaluate the pseudotime tree uncertainty, as one of the main functions in lamain module 1.
 #'
+#' @import parallel
 #' @param inferobj the output object from function infer_tree_structure().
 #' @param n.permute: a numeric number of permutation in the permutation test.
 #' @param subset.cell a character vector of the names of the selected cells where boostrap will happen on. If NULL, then boostrap from all the cells.
@@ -18,7 +19,8 @@ evaluate_uncertainty <-
            n.permute,
            subset.cell = NULL,
            design = NULL,
-           return.ctcomp = FALSE 
+           return.ctcomp = FALSE,
+           ncores = detectCores()
            # branchPropTest.method = 'ttest', ## this is a quick way to call the t-test in branchPropTest(); however, if want to use the multinom test, call branchPropTest() separately. 
            # branchPropTest.value.log = FALSE
   ) {
@@ -44,7 +46,7 @@ evaluate_uncertainty <-
       
       ## cluster cells
       invisible(capture.output(clu <-
-        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster))
+        mykmeans(pr.pm, number.cluster = max(inferobj$clusterid))$cluster), ncores = ncores)
       
       
       ## build pseudotime
