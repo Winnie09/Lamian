@@ -2,7 +2,7 @@
 #'
 #' This function is used to perform model fitting in one permutation setting.
 #'
-#' @author Wenpin Hou <whou10@jhu.edu>
+#' @author Wenpin Hou <wh2526@cumc.columbia.edu>
 #' @return a list of two elements. The first is for full model, while the second is for null model. Each element is a list containing data and parameter estimates.
 #' @import stats Matrix splines parallel
 #' @param iter a numeric number indicating which iteration it is in a permutation test. If iter = 1, it is  fitting the original data (not permuted).
@@ -68,7 +68,7 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full) ##
+      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full) 
       fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))

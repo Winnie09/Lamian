@@ -3,7 +3,7 @@
 #' This function is designed for doing different tests.
 #'
 #' @export
-#' @author Wenpin Hou <whou10@jhu.edu>
+#' @author Wenpin Hou <wh2526@cumc.columbia.edu>
 #' @import parallel splines devtools
 #' @return a list of results
 #' @param expr gene by cell expression matrix. Values are library-size-normalized log-transformed gene expression matrix. They can be either imputed or non-imputed. Zero-expression genes should have been filtered out.
@@ -73,7 +73,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
                  pseudotime,
                  design[, 1, drop = FALSE],
                  EMmaxiter = EMmaxiter,
-                 EMitercutoff = EMitercutoff) ##  
+                 EMitercutoff = EMitercutoff) 
       ll0 <- sapply(res0[[1]], function(i) i$ll)
       paradiff10 <- sapply(res1[[1]], function(i) length(unlist(i[seq_len(4)]))) - sapply(res0[[1]], function(i) length(unlist(i[seq_len(4)])))
       pval.chisq.constantTest <- pchisq(2*(ll1-ll0),df=paradiff10,lower.tail = F)
@@ -193,21 +193,21 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
         }, mc.cores = ncores)
     }
     if (verbose.output) {
-      print('The length of fit is ...')  ##
+      print('The length of fit is ...')  
       print(sapply(fit, length))
-      print(summary(sapply(fit,is.null))) ##
+      print(summary(sapply(fit,is.null))) 
     }
     fit <- fit[!sapply(fit,is.null)]
     if (verbose.output){
-      print('The length of fit after removing null is ...')  ##
+      print('The length of fit after removing null is ...')  
       print(sapply(fit, length))
-      print(summary(sapply(fit,is.null))) ##  
+      print(summary(sapply(fit,is.null))) 
     }
     
     if (length(fit[[1]]) > 1){
       fit <- fit[sapply(fit,length) > 1]
       if (verbose.output){
-        print('The length of fit having both null and full model is ...')  ##
+        print('The length of fit having both null and full model is ...')  
         print(sapply(fit, length))  
       }  
     }
