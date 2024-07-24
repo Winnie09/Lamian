@@ -18,11 +18,11 @@ author:
   name: Hongkai Ji\*
 date: '`r format(Sys.time(), "%d %B , %Y")`'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_depth: '3'
-  pdf_document: default
   rmarkdown::html_document:
     toc: yes
     toc_depth: 3
@@ -64,6 +64,8 @@ suppressMessages(library(Lamian))
 ```
 
 # Module 1: tree variability
+
+**[Note: Module 1 is independent of Module 3 and 4.]** 
 
 The module 1 of Lamian is designed for detecting the stability of branches in a pseudotime tree structure. We automatically enumerate all branches from the pseudotime tree structure, and then test for their detection rate through 10,000 bootstraps. After each cell-bootstrapping, we reconstruct the tree structure and re-identify all branches. We apply both Jaccard statistics and overlap coefficient as the statistics for evaluating whether any branch in a bootstrap setting matches with one of the original branches. A branch's detection rate is defined as the percentage of bootstrap settings that a branch finds it match. Module 1 also reports and tests for samples' proportion in each branch.
 
@@ -158,6 +160,8 @@ branchPropTest(data = data, design = design)
 
 # Module 3: Trajectory differential tests about gene expression
 
+**[Note: Modules 3 and 4 is independent of Modules 1 and 2. You can use your own inputs rather than the output from Module 1.]**
+
 ## XDE test
 
 ### Data preparation
@@ -205,6 +209,11 @@ saveh5(expr = expdata$expr,
        path = 'data/multi.h5')
 ```
 
+
+
+### Pseudotime output from TSCAN
+
+By default, Lamian takes pseudotime values output from TSCAN which are integers. If you use other pseudotime inference methods (e.g. slingshot) please refer to the section **Apply other pseudotime inference methods in Lamian: take slingshot as an example**.  [Most of the bugs were associated with the pseudotime values.]{color="red"}
 
 ### Perform XDE test
 We can perform *XDE test* using four inputs **expr**, **cellanno**, **pseudotime**, and **design**.

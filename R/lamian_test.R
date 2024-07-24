@@ -33,6 +33,8 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
   cellanno = data.frame(Cell = as.character(cellanno[,1]), Sample = as.character(cellanno[,2]), stringsAsFactors = FALSE)
   expr <- expr[, names(pseudotime), drop = FALSE]
   cellanno <- cellanno[match(names(pseudotime), cellanno[,1]), ]
+  design[,1] <- as.numeric(design[,1])
+  design[,2] <- as.numeric(design[,2])
   design = as.matrix(design)
   
   if (fix.all.zero){

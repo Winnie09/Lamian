@@ -68,8 +68,8 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full)
-      fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
+      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full) ##
+      fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))

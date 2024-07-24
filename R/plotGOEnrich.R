@@ -43,7 +43,7 @@ plotGOEnrich <-
     }, simplify = FALSE))
     ut <- unique(cd$Term)
     d <- d[d$Term %in% ut, c('Cluster', 'Term', 'FDR', 'FC')]
-    
+    d <- d[complete.cases(d),]
     d <- d[d$FDR < fdr.cutoff & d$FC > fc.cutoff, , drop = FALSE]
     
     dmat <- dcast(d, Term ~ Cluster)
@@ -61,6 +61,7 @@ plotGOEnrich <-
     pd$Term <-
       factor(as.character(pd$Term), levels = names(v[rev(order(v))]))
     pd$enc <- ifelse(pd$enc, 'Non-significant', 'Significant')
+    pd$Cluster <- factor(pd$Cluster, levels = unique(pd$Cluster)[order(as.numeric(unique(pd$Cluster)))])
     p <-
       ggplot(pd, aes(x = pd[,2], y = pd[,1], fill = pd[,3])) + geom_tile() + theme_classic() + scale_fill_manual(values =
                                                                                                                c('darkblue', 'orange')) +

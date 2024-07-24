@@ -10,7 +10,7 @@ biocViews: StatisticalMethod, Bayesian, TimeCourse, WorkflowStep,
         DifferentialExpression
 Encoding: UTF-8
 License: GPL-2
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Imports: devtools, grid, ggplot2, gridExtra, grDevices, igraph,
         matrixcalc, Matrix, RColorBrewer, TSCAN, org.Hs.eg.db,
@@ -19,7 +19,7 @@ Imports: devtools, grid, ggplot2, gridExtra, grDevices, igraph,
 Suggests: knitr, rmarkdown, markdown
 Depends: R (>= 3.6.1)
 NeedsCompilation: no
-Packaged: 2023-02-26 21:10:47 UTC; wenpinhou
+Packaged: 2024-07-24 15:36:03 UTC; wenpinhou
 Authors@R: person("Wenpin", "Hou", email = "wp.hou3@gmail.com", role = c("cre","aut"), comment = c(ORCID = "0000-0003-0972-2192"))
 Author: Wenpin Hou [cre, aut] (<https://orcid.org/0000-0003-0972-2192>)
 Maintainer: Wenpin Hou <wp.hou3@gmail.com>

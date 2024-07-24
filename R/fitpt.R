@@ -45,7 +45,7 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
     maxknot <- maxknot + 1
     phi <- philist[[as.character(maxknot)]]
     testpos <- mean(sapply(names(sname), function(ss) {
-      is.positive.definite(crossprod(phi[sname[[ss]],,drop=F]))
+      matrixcalc::is.positive.definite(crossprod(phi[sname[[ss]],,drop=F]))
     })) == 1
   }
   maxknot <- maxknot - 1
@@ -70,7 +70,7 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
     }
     
     if (ncores!=1) {
-      bic <- mclapply(0:maxknot,bicfunc,mc.cores=ncores)
+      bic <- parallel::mclapply(0:maxknot,bicfunc,mc.cores=ncores)
       bic <- do.call(cbind,bic)
     } else {
       bic <- sapply(0:maxknot,bicfunc)
@@ -265,7 +265,7 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
   }
   
   if (ncores!=1) {
-    allres <- mclapply(unique(knotnum),sfit,mc.cores=ncores)
+    allres <- parallel::mclapply(unique(knotnum),sfit,mc.cores=ncores)
   } else {
     allres <- sapply(unique(knotnum),sfit, simplify = FALSE)
   }
