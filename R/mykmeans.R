@@ -16,14 +16,15 @@ mykmeans <-
   function(matrix,
            number.cluster = NA,
            maxclunum = 30,
-           seed = 12345) {
+           seed = 12345,
+           ncores = detectCores()) {
     library(parallel)
     if (is.na(number.cluster)) {
       rss <- mclapply(seq_len(maxclunum), function(clunum) {
         ## set.seed(seed)
         tmp <- kmeans(matrix, clunum, iter.max = 1000)
         tmp$betweenss / tmp$totss
-      }, mc.cores = 30)
+      }, mc.cores = ncores)
       rss <- unlist(rss)
       # number.cluster <- which(diff(rss) < 1e-2)[1]
       x <- 2:maxclunum
