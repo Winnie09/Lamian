@@ -21,6 +21,7 @@ cellPropTest <- function(cellanno,
                          design = NULL,
                          ncores = detectCores(),
                          test.type = 'variable',
+                         permuiter = 100,
                          testvar = 2) {
   ptw <-
     cut(pseudotime, seq(min(pseudotime), max(pseudotime), length.out = 100), include.lowest = T)
@@ -54,6 +55,7 @@ cellPropTest <- function(cellanno,
       ncores = ncores,
       test.type = test.type,
       test.method = 'permutation',
+      permuiter = permuiter,
       ncores.fit = 1,
       fix.all.zero = F
     )

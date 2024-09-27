@@ -17,7 +17,7 @@
 getPopulationFit <- function(testobj,
                              gene = NULL,
                              type = 'time',
-                             num.timepoint = 1e3){
+                             num.timepoint = max(testobj$pseudotime)){
   type <- toupper(type)
   if (!'testvar' %in% names(testobj)) {
     testvar <- testobj$testvar <- 2
