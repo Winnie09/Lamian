@@ -15,7 +15,7 @@ branchPropTest <- function(data, design, method = 't.test') {
   if (method == 't.test'){
     id1 = which(design[, 2] == 0)
     id2 = which(design[, 2] == 1)
-    res <- apply(data, 1, function(i)
+    res <- apply(data[,design[,1]], 1, function(i)
       t.test(i[id1], i[id2])$p.value)
     
   }
