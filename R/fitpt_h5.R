@@ -252,11 +252,24 @@ fitpt_h5 <- function(expr,
       
       rN <- sumN/length(as)
       rA <- sumA/length(as)
-      eta[gidr] <- sapply(gidr,function(g) {
+      eta[gidr] <- sapply(gidr, function(g) {
         meanN <- rN[g]
         meanA <- rA[g]
-        # uniroot(function(eta) {digamma(eta * meanN)-log(eta)+meanA},c(1e-10,1e10))$root
-        optim(eta[g],fn = function(eta) {(digamma(eta * meanN)-log(eta)+meanA)^2},gr = function(eta) {2*(digamma(eta * meanN)-log(eta)+meanA)*(trigamma(eta*meanN)*meanN-1/eta)},lower = 1e-10,method = 'L-BFGS-B')$par
+        f <- function(eta) digamma(eta * meanN) - log(eta) + meanA
+        f_lower <- f(1e-10)
+        f_upper <- f(1e10)
+        if (f_lower * f_upper > 0) {
+          result <- tryCatch(
+            uniroot(f, c(1e-20, 1e20), tol = 1e-12)$root,
+            error = function(e) {
+              warning(paste0("No root found for gene: ", g))
+              NA
+            }
+          )
+        } else {
+          result <- uniroot(f, c(1e-10, 1e10))$root
+        }
+        result
       })
       alpha[gidr] <- eta[gidr] * rN
       

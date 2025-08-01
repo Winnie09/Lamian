@@ -95,10 +95,24 @@ fitpt.m0 <- function(expr, cellanno, pseudotime, design, EMmaxiter=100, EMitercu
       Jsolve[,s,drop=F] + N[,s,drop=F]*JK[[s]] * JK[[s]]  ## [if debug, here]
     }), ncol=length(as), dimnames = list(gidr, as)))
     
-    eta[gidr] <- sapply(gidr,function(g) {
-      meanN <- mean(N[g,])
-      meanA <- mean(A[g,])
-      uniroot(function(eta) {digamma(eta * meanN)-log(eta)+meanA},c(1e-10,1e10))$root
+    eta[gidr] <- sapply(gidr, function(g) {
+      meanN <- mean(N[g, ])
+      meanA <- mean(A[g, ])
+      f <- function(eta) digamma(eta * meanN) - log(eta) + meanA
+      f_lower <- f(1e-10)
+      f_upper <- f(1e10)
+      if (f_lower * f_upper > 0) {
+        result <- tryCatch(
+          uniroot(f, c(1e-20, 1e20), tol = 1e-12)$root,
+          error = function(e) {
+            warning(paste0("No root found for gene: ", g))
+            NA
+          }
+        )
+      } else {
+        result <- uniroot(f, c(1e-10, 1e10))$root
+      }
+      result
     })
     alpha[gidr] <- eta[gidr] * rowMeans(N)
     para <- list(beta = B, alpha = alpha, eta = eta, omega = omega)

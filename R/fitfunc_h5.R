@@ -18,12 +18,12 @@
 #' @param EMitercutoff a numeric number indicating the log-likelihood cutoff applied to stop the EM algorithm
 #' @param verbose.output logical. If TRUE, print intermediate information.
 #' @param ncores the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.
-fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testvar, test.type = 'Time', expr = expr, cellanno = cellanno, pseudotime = pseudotime, design = design, EMmaxiter = 100, EMitercutoff = 0.05, verbose.output = F, ncores = 1) {
+fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testvar, maxknotallowed = 10, test.type = 'Time', expr = expr, cellanno = cellanno, pseudotime = pseudotime, design = design, EMmaxiter = 100, EMitercutoff = 0.05, verbose.output = F, ncores = 1) {
   if (verbose.output) print(paste0('iter ', iter, '\n'))
   if (toupper(test.type)=='TIME') {
     if (iter == 1) {
-      fitres.full <- fitpt_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],testvar=testvar,targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model=-1)
-      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE],testvar=testvar, maxknotallowed = maxknotallowed, targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model=-1)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=pseudotime, design=design[,1,drop=FALSE], targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
       return(list(fitres.full = fitres.full, fitres.null = fitres.null))
     } else {
       perpsn <- lapply(rownames(design), function(s){
@@ -42,8 +42,8 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       perpsn <- perpsn[sampcell]
       boot <- data.frame(percellanno[,1],paste0('cell_',1:length(perpsn)),stringsAsFactors = F) #### rename cells
       percellanno[,1] <- names(perpsn) <- paste0('cell_',1:length(perpsn)) ## save the original cell name and permuted cell names relation, not used here actually, because hdf5 file already save the cells for each sample seperately
-      fitres.full <- fitpt_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = -1,testvar=testvar)
-      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
+      fitres.full <- fitpt_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = -1,testvar=testvar)
+      fitres.null <- fitpt_m0_h5(expr=expr, pseudotime=perpsn, design=design, boot=boot,targetgene=gene, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
@@ -65,8 +65,8 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full,testvar=testvar)
-      fitres.null <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
+      fitres.full <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full, testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  pseudotime, design,targetgene=gene, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
@@ -80,10 +80,17 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
     } else {
       dn <- paste0(as.vector(design),collapse = '_')
       perdn <- dn
-      while(perdn==dn) {
+      # make sure perdesign is full rank
+      while (TRUE) {
         perid <- sample(1:nrow(design))
-        perdesign <- design[perid,,drop=F]
-        perdn <- paste0(as.vector(perdesign),collapse = '_')  
+        perdesign <- design
+        perdesign[, testvar] <- design[perid, testvar]
+        rnk <- as.integer(Matrix::rankMatrix(perdesign))
+        perdn_new <- paste0(perdesign[, testvar], collapse = '_')
+        if (perdn_new != dn && rnk == ncol(perdesign)) {
+          perdn <- perdn_new
+          break 
+        }
       }
       row.names(perdesign) <- row.names(design)
       sampcell <- sample(1:length(pseudotime),replace=T) ## boostrap cells
@@ -94,8 +101,8 @@ fitfunc_h5 <- function(iter, diffType = 'overall', gene = NULL, testvar = testva
       percellanno[,1] <- names(psn) <- paste0('cell_',1:length(psn))
       
       
-      fitres.full <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.full,testvar=testvar)
-      fitres.null <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
+      fitres.full <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.full,testvar=testvar)
+      fitres.null <- fitpt_h5(expr,  psn, perdesign, boot=boot,targetgene=gene,maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]],testvar=testvar)
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))

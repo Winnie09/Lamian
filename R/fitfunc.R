@@ -20,13 +20,13 @@
 #' @param ncores the number of cores to be used. If ncores > 1, it will be implemented in parallel mode.
 #' @param verbose.output logical. If TRUE, print intermediate information.
 
-fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type = 'Time', testvar=testvar, EMmaxiter=100, EMitercutoff=0.05, ncores=1, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design, verbose.output = FALSE) {
+fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type = 'Time', testvar=testvar, maxknotallowed = 10, EMmaxiter=100, EMitercutoff=0.05, ncores=1, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design, verbose.output = FALSE) {
   expr <- expr[gene, ,drop=FALSE]
   if (verbose.output) print(paste0('iter ', iter, '\n'))
   if (toupper(test.type)=='TIME') {
     if (iter == 1){
-      fitres.full <- fitpt(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], testvar=testvar,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model=-1)
-      fitres.null <- fitpt.m0(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff)
+      fitres.full <- fitpt(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model=-1)
+      fitres.null <- fitpt.m0(expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design[,1,drop=FALSE], EMmaxiter=EMmaxiter, maxknotallowed = maxknotallowed, EMitercutoff=EMitercutoff)
       return(list(fitres.full = fitres.full, fitres.null = fitres.null))
     } else {
       perpsn <- lapply(rownames(design), function(s){
@@ -45,8 +45,8 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       percellanno <- cellanno[sampcell,,drop=F]
       perpsn <- perpsn[sampcell]
       colnames(perexpr) <- percellanno[,1] <- names(perpsn) <- paste0('cell_',1:length(perpsn))
-      tryCatch(fitres.full <- fitpt(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = -1), warning = function(w){}, error = function(e) {})
-      tryCatch(fitres.null <- fitpt.m0(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff), warning = function(w){}, error = function(e) {})
+      tryCatch(fitres.full <- fitpt(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design,testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = -1), warning = function(w){}, error = function(e) {})
+      tryCatch(fitres.null <- fitpt.m0(expr=perexpr, cellanno=percellanno, pseudotime=perpsn, design=design, EMmaxiter=EMmaxiter, maxknotallowed = maxknotallowed, EMitercutoff=EMitercutoff), warning = function(w){}, error = function(e) {})
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
@@ -68,8 +68,8 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       mod.null = 2
     }
     if (iter == 1){
-      fitres.full <- fitpt(expr, cellanno, pseudotime, design,testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full) 
-      fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
+      fitres.full <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.full) 
+      fitres.null <- fitpt(expr, cellanno, pseudotime, design, testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=1, model = mod.null, knotnum = fitres.full[[2]])
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))
@@ -80,11 +80,17 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
     } else {
       dn <- paste0(design[,testvar],collapse = '_')
       perdn <- dn
-      while(perdn==dn) {
+      # make sure perdesign is full rank
+      while (TRUE) {
         perid <- sample(1:nrow(design))
         perdesign <- design
-        perdesign[,testvar] <- design[perid,testvar]
-        perdn <- paste0(perdesign[,testvar],collapse = '_')  
+        perdesign[, testvar] <- design[perid, testvar]
+        rnk <- as.integer(Matrix::rankMatrix(perdesign))
+        perdn_new <- paste0(perdesign[, testvar], collapse = '_')
+        if (perdn_new != dn && rnk == ncol(perdesign)) {
+          perdn <- perdn_new
+          break 
+        }
       }
       row.names(perdesign) <- row.names(design)
       sampcell <- sample(1:ncol(expr),replace=T) ## boostrap cells
@@ -95,8 +101,8 @@ fitfunc <- function(iter, diffType = 'overall', gene = rownames(expr), test.type
       colnames(perexpr) <- percellanno[,1] <- names(psn) <- paste0('cell_',1:length(psn))
       
       
-      fitres.full <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.full)
-      fitres.null <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]])
+      fitres.full <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.full)
+      fitres.null <- fitpt(perexpr, percellanno, psn, perdesign,testvar=testvar, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores, model = mod.null, knotnum = fitres.full[[2]])
       if (exists('fitres.full') & exists('fitres.null')) {
         if (verbose.output) print(paste0('iter ', iter, ' success!'))
         return(list(fitres.full = fitres.full, fitres.null = fitres.null))

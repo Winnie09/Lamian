@@ -27,7 +27,7 @@
 #' data(expdata)
 #' res <- lamian_test_h5(expr='data/multi.h5', cellanno=expdata$cellanno, pseudotime=expdata$pseudotime, design=expdata$design, testvar=2, test.type = 'Variable', overall.only = F, test.method = 'chisq')
 
-lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, permuiter=100, EMmaxiter=100, EMitercutoff=0.05, verbose.output=F, ncores=detectCores(), test.type='Time', fit.resolution = 1000, return.all.data = TRUE, overall.only = F, test.method = 'permutation', ncores.fit = 1, fix.all.zero = TRUE, cutoff = 1e-5) {
+lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, permuiter=100, maxknotallowed = 10, EMmaxiter=100, EMitercutoff=0.05, verbose.output=F, ncores=detectCores(), test.type='Time', fit.resolution = 1000, return.all.data = TRUE, overall.only = F, test.method = 'permutation', ncores.fit = 1, fix.all.zero = TRUE, cutoff = 1e-5) {
   cellanno <- cellanno[match(names(pseudotime), cellanno[,1]), ]
   if (test.method == 'permutation') ncores.fit = 1
   set.seed(12345)
@@ -38,9 +38,9 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
   
   if (test.method == 'chisq'){
     if (toupper(test.type) == 'TIME'){
-      res1 <- fitpt_h5(expr,  pseudotime, design=design[,1,drop=FALSE], maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 1,testvar=testvar)##save 13%
+      res1 <- fitpt_h5(expr,  pseudotime, design=design[,1,drop=FALSE], maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 1,testvar=testvar)##save 13%
       ll1 <- sapply(res1$parameter,function(i) i$ll)
-      res0 <- fitpt_h5(expr, pseudotime, design[,1,drop=FALSE],EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff) ##  
+      res0 <- fitpt_h5(expr, pseudotime, design[,1,drop=FALSE], maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff) ##  
       ll0 <- sapply(res0[[1]], function(i) i$ll)
       paradiff10 <- sapply(res1[[1]], function(i) length(unlist(i[1:4]))) - sapply(res0[[1]], function(i) length(unlist(i[1:4])))
       pval.chisq.constantTest <- pchisq(2*(ll1-ll0),df=paradiff10,lower.tail = F)
@@ -52,11 +52,11 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
                         stringsAsFactors = FALSE)
       reslist = list(statistics = res,  parameter = res1$parameter, knotnum = res1$knotnum)  ## function return
     } else if (toupper(test.type) == 'VARIABLE'){
-      res1 <- fitpt_h5(expr, pseudotime, design, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 1,testvar=testvar)## save 13%
+      res1 <- fitpt_h5(expr, pseudotime, design, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 1,testvar=testvar)## save 13%
       ll1 <- sapply(res1$parameter,function(i) i$ll)
-      res2 <- fitpt_h5(expr, pseudotime, design, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 2, knotnum = res1[[2]],testvar=testvar)## save 13%
+      res2 <- fitpt_h5(expr, pseudotime, design, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 2, knotnum = res1[[2]],testvar=testvar)## save 13%
       ll2 <- sapply(res2$parameter,function(i) i$ll)
-      res3 <- fitpt_h5(expr, pseudotime, design, maxknotallowed=10, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 3, knotnum = res1[[2]],testvar=testvar)
+      res3 <- fitpt_h5(expr, pseudotime, design, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, ncores=ncores.fit, model = 3, knotnum = res1[[2]],testvar=testvar)
       ll3 <- sapply(res3$parameter,function(i) i$ll)
       
       paradiff31 <- sapply(res3$parameter,function(i) length(i$beta))-sapply(res1$parameter,function(i) length(i$beta))
@@ -84,8 +84,8 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
   } else if (test.method == 'permutation'){
     if (verbose.output) print('fitting model: overall: CovariateTest (Model 3 vs.1) or ConstantTest (Model 1) ...')
     if (ncores == 1){
-      fit <- lapply(1:(permuiter+1),function(i) fitfunc_h5(iter = i, diffType = 'overall', test.type = test.type, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))} else {
-        fit <- mclapply(1:(permuiter+1),function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'overall', test.type = test.type, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores)
+      fit <- lapply(1:(permuiter+1),function(i) fitfunc_h5(iter = i, diffType = 'overall', test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))} else {
+        fit <- mclapply(1:(permuiter+1),function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'overall', test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores)
       }
     if (verbose.output) {
       print('The length of fit is ...')  ##
@@ -108,22 +108,23 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       }
       
     }
-    # saveRDS(fit, '/home-4/whou10@jhu.edu/scratch/Wenpin/trajectory_variability/debug/fitoverall.rds')
+    # saveRDS(fit, '/projectnb/wax-es/Bingtian/Lamian/test_for_design/4sample_TCPO/fitoverall.RDS')
     knotnum <- fit[[1]]$fitres.full$knotnum
     parameter <- fit[[1]]$fitres.full$parameter
     ll.full <- sapply(1:(length(fit)),function(i) sapply(fit[[i]]$fitres.full$parameter,function(j) unname(j$ll),USE.NAMES = F)[gn])
     ll.null <- sapply(1:(length(fit)),function(i) sapply(fit[[i]]$fitres.null$parameter,function(j) unname(j$ll),USE.NAMES = F)[gn])
     llr.overall <- ll.full - ll.null
-    pval.overall <- sapply(1:nrow(llr.overall), function(i) {
-      z <- llr.overall[i,2:ncol(llr.overall)]
+    pval.overall <- sapply(seq_len(nrow(llr.overall)), function(i) {
+      z <- llr.overall[i, seq(2, ncol(llr.overall))]
+      z <- z[!is.na(z)]
       den <- density(z)$bw
-      mean(pnorm(llr.overall[i,1], z, sd=den, lower.tail = F))
+      mean(pnorm(llr.overall[i, 1], z, sd = den, lower.tail = F))
     })
-    
-    log.pval <- sapply(1:nrow(llr.overall), function(i) {
-      z <- llr.overall[i,2:ncol(llr.overall)]
+    log.pval <- sapply(seq_len(nrow(llr.overall)), function(i) {
+      z <- llr.overall[i, seq(2, ncol(llr.overall))]
+      z <- z[!is.na(z)]
       den <- density(z)$bw
-      max(pnorm(llr.overall[i,1], z, sd=den, lower.tail = F, log.p = T))
+      max(pnorm(llr.overall[i, 1], z, sd = den, lower.tail = F, log.p = T))
     })
     fdr.overall <- p.adjust(pval.overall,method='fdr')
     names(pval.overall) <- names(fdr.overall) <- row.names(llr.overall)
@@ -135,9 +136,9 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
     if (sum(fdr.overall <0.05 ) > 0 & toupper(test.type) == 'VARIABLE' & !overall.only){
       if (verbose.output) print('meanDiff pvalues: Model 2 vs. model 1...')
       if (ncores == 1){
-        fit <- lapply(seq_len(permuiter+1),function(i) fitfunc_h5(iter = i, diffType = 'meanDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))
+        fit <- lapply(seq_len(permuiter+1),function(i) fitfunc_h5(iter = i, diffType = 'meanDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))
       } else {
-        fit <- mclapply(seq_len(permuiter+1),function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'meanDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type,EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores)
+        fit <- mclapply(seq_len(permuiter+1),function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'meanDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores)
       }
       fit <- fit[!sapply(fit,is.null)]
       ll.full <- sapply(1:(length(fit)),function(i) sapply(fit[[i]]$fitres.full$parameter,function(j) unname(j$ll),USE.NAMES = F)[gn])
@@ -146,6 +147,7 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       llr <- llr[complete.cases(llr), ]
       if (sum(fdr.overall<0.05) == 1){
         z <- llr[2:length(llr)]
+        z <- z[!is.na(z)]
         den <- density(z)$bw
         fdr <- pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F))
         log.pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F,log.p=T))
@@ -154,11 +156,13 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       } else {
         pval <- sapply(1:nrow(llr), function(i) {
           z <- llr[i,2:ncol(llr)]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           mean(pnorm(llr[i,1], z, sd=den,lower.tail = F))
         })
         log.pval <- sapply(1:nrow(llr), function(i) {
           z <- llr[i,2:ncol(llr)]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           max(pnorm(llr[i,1], z, sd=den,lower.tail = F, log.p = T))
         })
@@ -170,9 +174,9 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       
       if (verbose.output) print('trendDiff pvalues: Model 3 vs. model 2...')
       if (ncores == 1){
-        fit <- lapply(1:(permuiter+1), function(i) fitfunc_h5(iter = i, diffType = 'trendDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))
+        fit <- lapply(1:(permuiter+1), function(i) fitfunc_h5(iter = i, diffType = 'trendDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar))
       } else {
-        fit <- mclapply(1:(permuiter+1), function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'trendDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores) ## return a list of (permuiter + 1) where the first is a list of fitres.full and fitres.null
+        fit <- mclapply(1:(permuiter+1), function(i){set.seed(i); fitfunc_h5(iter = i, diffType = 'trendDiff', gene = names(fdr.overall)[fdr.overall<0.05], test.type = test.type, maxknotallowed = maxknotallowed, EMmaxiter=EMmaxiter, EMitercutoff=EMitercutoff, verbose.output=verbose.output, expr=expr, cellanno=cellanno, pseudotime=pseudotime, design=design,testvar=testvar)}, mc.cores = ncores) ## return a list of (permuiter + 1) where the first is a list of fitres.full and fitres.null
       }
       fit <- fit[!sapply(fit,is.null)]
       ll.full <- sapply(1:(length(fit)),function(i) sapply(fit[[i]]$fitres.full$parameter,function(j) unname(j$ll),USE.NAMES = F)[gn])
@@ -181,6 +185,7 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       llr <- llr[complete.cases(llr), ]
       if (sum(fdr.overall<0.05) == 1){
         z <- llr[2:length(llr)]
+        z <- z[!is.na(z)]
         den <- density(z)$bw
         fdr <- pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F))
         log.pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F,log.p=T))
@@ -189,11 +194,13 @@ lamian_test_h5 <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, p
       } else {
         pval <- sapply(1:nrow(llr), function(i) {
           z <- llr[i,2:ncol(llr)]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           mean(pnorm(llr[i,1], z, sd=den,lower.tail = F))
         })
         log.pval <- sapply(1:nrow(llr), function(i) {
           z <- llr[i,2:ncol(llr)]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           max(pnorm(llr[i,1], z, sd=den,lower.tail = F, log.p = T))
         })

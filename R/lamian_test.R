@@ -27,7 +27,7 @@
 #' data(mandata)
 #' a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10, verbose.output = FALSE)
 
-lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, permuiter=100, EMmaxiter=100, EMitercutoff=0.05, verbose.output = FALSE, ncores=detectCores(), test.type='Time', fit.resolution = 1000, return.all.data = TRUE, overall.only = FALSE, test.method = 'permutation', ncores.fit = 1, fix.all.zero = TRUE, cutoff = 1e-5, sd.adjust = 1) { 
+lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, permuiter=100, maxknotallowed = 10, EMmaxiter=100, EMitercutoff=0.05, verbose.output = FALSE, ncores=detectCores(), test.type='Time', fit.resolution = 1000, return.all.data = TRUE, overall.only = FALSE, test.method = 'permutation', ncores.fit = 1, fix.all.zero = TRUE, cutoff = 1e-5, sd.adjust = 1e-5) { 
   if (test.method == 'permutation') ncores.fit = 1
   set.seed(12345)
   cellanno = data.frame(Cell = as.character(cellanno[,1]), Sample = as.character(cellanno[,2]), stringsAsFactors = FALSE)
@@ -60,6 +60,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
           pseudotime,
           design = design[, 1, drop = FALSE],
           testvar = testvar,
+          maxknotallowed = maxknotallowed,
           maxknotallowed = 10,
           EMmaxiter = EMmaxiter,
           EMitercutoff = EMitercutoff,
@@ -92,7 +93,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
           pseudotime,
           design,
           testvar = testvar,
-          maxknotallowed = 10,
+          maxknotallowed = maxknotallowed,
           EMmaxiter = EMmaxiter,
           EMitercutoff = EMitercutoff,
           ncores = ncores.fit,
@@ -107,7 +108,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
           pseudotime,
           design,
           testvar = testvar,
-          maxknotallowed = 10,
+          maxknotallowed = maxknotallowed,
           EMmaxiter = EMmaxiter,
           EMitercutoff = EMitercutoff,
           ncores = ncores.fit,
@@ -123,7 +124,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
           pseudotime,
           design,
           testvar = testvar,
-          maxknotallowed = 10,
+          maxknotallowed = maxknotallowed,
           EMmaxiter = EMmaxiter,
           EMitercutoff = EMitercutoff,
           ncores = ncores.fit,
@@ -165,6 +166,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
             diffType = 'overall',
             test.type = test.type,
             testvar = testvar,
+            maxknotallowed = maxknotallowed,
             EMmaxiter = EMmaxiter,
             EMitercutoff = EMitercutoff,
             verbose.output = verbose.output,
@@ -182,6 +184,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
             diffType = 'overall',
             test.type = test.type,
             testvar = testvar,
+            maxknotallowed = maxknotallowed,
             EMmaxiter = EMmaxiter,
             EMitercutoff = EMitercutoff,
             verbose.output = verbose.output,
@@ -219,14 +222,15 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
     llr.overall <- ll.full - ll.null
     pval.overall <- sapply(seq_len(nrow(llr.overall)), function(i) {
       z <- llr.overall[i, seq(2, ncol(llr.overall))]
+      z <- z[!is.na(z)]
       den <- density(z)$bw
-      mean(pnorm(llr.overall[i,1], z, sd=den, lower.tail = F))
+      mean(pnorm(llr.overall[i, 1], z, sd = den, lower.tail = F))
     })
-    
     log.pval <- sapply(seq_len(nrow(llr.overall)), function(i) {
       z <- llr.overall[i, seq(2, ncol(llr.overall))]
+      z <- z[!is.na(z)]
       den <- density(z)$bw
-      max(pnorm(llr.overall[i,1], z, sd=den, lower.tail = F, log.p = T))
+      max(pnorm(llr.overall[i, 1], z, sd = den, lower.tail = F, log.p = T))
     })
     fdr.overall <- p.adjust(pval.overall,method='fdr')
     names(pval.overall) <- names(fdr.overall) <- row.names(llr.overall)
@@ -245,6 +249,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
               diffType = 'meanDiff',
               gene = names(fdr.overall)[fdr.overall < 0.05],
               test.type = test.type,
+              maxknotallowed = maxknotallowed,
               EMmaxiter = EMmaxiter,
               EMitercutoff = EMitercutoff,
               verbose.output = verbose.output,
@@ -263,6 +268,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
               diffType = 'meanDiff',
               gene = names(fdr.overall)[fdr.overall < 0.05],
               test.type = test.type,
+              maxknotallowed = maxknotallowed,
               EMmaxiter = EMmaxiter,
               EMitercutoff = EMitercutoff,
               verbose.output = verbose.output,
@@ -281,6 +287,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
       llr <- llr[complete.cases(llr), ]
       if (sum(fdr.overall<0.05) == 1){
         z <- llr[seq(2, length(llr))]
+        z <- z[!is.na(z)]
         den <- density(z)$bw
         fdr <- pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F))
         log.pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F,log.p=T))
@@ -289,11 +296,13 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
       } else {
         pval <- sapply(seq_len(nrow(llr)), function(i) {
           z <- llr[i, seq(2, ncol(llr))]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           mean(pnorm(llr[i,1], z, sd=den,lower.tail = F))
         })
         log.pval <- sapply(seq_len(nrow(llr)), function(i) {
           z <- llr[i, seq(2, ncol(llr))]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           max(pnorm(llr[i,1], z, sd=den,lower.tail = F, log.p = T))
         })
@@ -311,6 +320,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
               diffType = 'trendDiff',
               gene = names(fdr.overall)[fdr.overall < 0.05],
               test.type = test.type,
+              maxknotallowed = maxknotallowed,
               EMmaxiter = EMmaxiter,
               EMitercutoff = EMitercutoff,
               verbose.output = verbose.output,
@@ -329,6 +339,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
               diffType = 'trendDiff',
               gene = names(fdr.overall)[fdr.overall < 0.05],
               test.type = test.type,
+              maxknotallowed = maxknotallowed,
               EMmaxiter = EMmaxiter,
               EMitercutoff = EMitercutoff,
               verbose.output = verbose.output,
@@ -347,6 +358,7 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
       llr <- llr[complete.cases(llr), ]
       if (sum(fdr.overall<0.05) == 1){
         z <- llr[seq(2, length(llr))]
+        z <- z[!is.na(z)]
         den <- density(z)$bw
         fdr <- pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F))
         log.pval <- mean(pnorm(llr[1], z, sd=den,lower.tail = F,log.p=T))
@@ -355,11 +367,13 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
       } else {
         pval <- sapply(seq_len(nrow(llr)), function(i) {
           z <- llr[i, seq(2, ncol(llr))]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           mean(pnorm(llr[i,1], z, sd=den,lower.tail = F))
         })
         log.pval <- sapply(seq_len(nrow(llr)), function(i) {
           z <- llr[i, seq(2, ncol(llr))]
+          z <- z[!is.na(z)]
           den <- density(z)$bw
           max(pnorm(llr[i,1], z, sd=den,lower.tail = F, log.p = T))
         })
@@ -390,4 +404,3 @@ lamian_test <- function(expr, cellanno, pseudotime, design=NULL, testvar=2, perm
     return(c(reslist, list(test.type = test.type, test.method = test.method, testvar = testvar)))
   } 
 }
-
