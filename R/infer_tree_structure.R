@@ -2,10 +2,10 @@
 #'
 #' This function takes a low dimensional-reduction representation (for example, pca), the cell annotation, etc. as inputs, and then infer the pseudotime tree structures for further assessing the uncertainty of each of the pseudotime tree branches.
 #'
-#' @author Wenpin Hou <whou10@jhu.edu>
+#' @author Wenpin Hou <wp.hou3@gmail.com>
 #' @return a list
 #' @export
-#' @import TSCAN scattermore RColorBrewer grDevices
+#' @import TSCAN scattermore RColorBrewer grDevices igraph
 #' @importFrom grDevices pdf
 #' @importFrom grDevices dev.off
 #' @param  pca cell by principal component (pc) matrix. Principal components reduction of the cells.
@@ -19,10 +19,8 @@
 #' @param  ylab the y-axis labels for the figures.
 #' @param  max.clunum the maximum number of clusters in the elbew's method.
 #' @examples
-#' data(hca_bm_pca)
-#' data(hca_bm_saver)
-#' data(hca_bm_cellanno)
-#' res = infer_tree_structure(pca = hca_bm_pca, expression = hca_bm_saver, cellanno = hca_bm_cellanno, origin.marker = c('CD34'), xlab='Principal component 1', ylab = 'Principal component 2')
+#' data(man_tree_data)
+#' res = infer_tree_structure(pca = man_tree_data[['pca']], cellanno = man_tree_data[['cellanno']], expression = man_tree_data[['expression']], origin.marker = c('CD34'), number.cluster = 5, xlab='Principal component 1', ylab = 'Principal component 2')
 
 infer_tree_structure <-
   function(pca,
@@ -51,7 +49,6 @@ infer_tree_structure <-
     ## clustering
     clu <-
       mykmeans(pr, maxclunum = 50, number.cluster = number.cluster, seed = kmeans.seed)$cluster
-    table(clu)
     pd = data.frame(x = pr[, 1],
                     y = pr[, 2],
                     cluster = as.factor(clu[rownames(pr)]))
@@ -68,7 +65,7 @@ infer_tree_structure <-
           x = pd[,1], y = pd[,2], color = pd[,3]
         )) +
           geom_scattermore() +
-          scale_color_manual(values = mypalette(max(clu))) +
+          scale_color_manual(values = mypalette(max(clu))) +   
           theme_classic() +
           theme(
             legend.spacing.y = unit(0.01, 'cm'),
@@ -80,7 +77,7 @@ infer_tree_structure <-
       dev.off()
     }
     ### mclust
-    mcl <- exprmclust(t(pr), cluster = clu, reduce = FALSE)
+    mcl <- TSCAN::exprmclust(t(pr), cluster = clu, reduce = FALSE)
     
     # --------------------
     # construct pseudotime

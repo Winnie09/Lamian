@@ -13,7 +13,6 @@ plotTDEHm(
   colann = NULL,
   rowann = NULL,
   annotation_colors = NULL,
-  type = "time",
   subsampleCell = TRUE,
   numSubsampleCell = 1000
 )
@@ -35,8 +34,6 @@ plotTDEHm(
 
 \item{annotation_colors}{a list. Will be passed onto the annotation_colors input in pheatmap().}
 
-\item{type}{One of c('Time', 'Variable')}
-
 \item{subsampleCell}{logical. If TRUE, will subsample cells.}
 
 \item{numSubsampleCell}{a numeric number indicating the number of cells users want to subsampled. Only useful when subsampleCell == TRUE.}
@@ -49,7 +46,6 @@ This function is used for plotting the fitting heatmaps.
 }
 \examples{
 data(mantestobj)
-plotTDEHm(testobj = mantestobj, type = 'variable', numSubsampleCell = 5)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

@@ -67,8 +67,12 @@ a list of results
 This function is designed for doing different tests when the input gene expression is in hdf5 format.
 }
 \examples{
+\dontrun{
 data(expdata)
-res <- lamian_test_h5(expr='data/multi.h5', cellanno=expdata$cellanno, pseudotime=expdata$pseudotime, design=expdata$design, testvar=2, test.type = 'Variable', overall.only = F, test.method = 'chisq')
+res <- lamian_test_h5(expr='multi.h5', cellanno=expdata$cellanno, pseudotime=expdata$pseudotime, design=expdata$design, testvar=2, test.type = 'Variable', overall.only = F, test.method = 'chisq')
+}
+data(mandata)
+a = lamian_test(expr = mandata$expr[seq(1,3),], cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, test.method = 'chisq', permuiter = 10, EMmaxiter = 10, EMitercutoff = 10, verbose.output = FALSE)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

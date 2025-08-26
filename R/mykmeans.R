@@ -5,6 +5,7 @@
 #' @import parallel
 #' @return k-means clustering result
 #' @author Wenpin Hou <whou10@jhu.edu>
+#' @export
 #' @param matrix cell by principal component (pc) matrix for cell clustering.
 #' @param number.cluster the number of clusters in cell clustering that will be used in trajectory inference. If NA (default),the number of clusters will be determined automatically by elbow's method.
 #' @param maxclunum the maximum number of clusters in the elbew's method.

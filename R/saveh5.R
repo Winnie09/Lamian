@@ -13,7 +13,7 @@
 #' @param sd.adjust the variance of the noise to be added if fix.all.zero is TRUE. 
 #' @examples
 #' data(expdata)
-#' saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
+#' saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'multi.h5')
 
 saveh5 <- function(expr, pseudotime, cellanno, path, fix.all.zero = TRUE, cutoff = 1e-3, sd.adjust = 1e-3) {
   expr <- expr[,names(pseudotime)]

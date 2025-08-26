@@ -4,9 +4,9 @@
 #'
 #' @param testObj the output object from lamian_test().
 #' @param gene a vector of genes that need to do the prediction.
-#' @param test.type One of c('Time', 'Variable').
+#' @param test.type One of c('Time', 'Variable') and case-insentivie.
 #' @return a gene by cell (or pseudotime) expression matrix
-#' @author Wenpin Hou <whou10@jhu.edu>
+#' @author Wenpin Hou <wp.hou3@gmail.com>
 predict_fitting <-
   function(testObj,
            gene = NULL,
@@ -22,7 +22,8 @@ predict_fitting <-
     knotnum = testObj$knotnum[gene]
     design = testObj$design
     cellanno = testObj$cellanno
-    pseudotime = testObj$pseudotime[colnames(expr)]
+    pseudotime = testObj$pseudotime[colnames(testObj$expr)]
+    
     if (is.null(gene))
       gene <- rownames(expr)
     philist <- lapply(sort(unique(knotnum)), function(num.knot) {
@@ -30,8 +31,7 @@ predict_fitting <-
         # phi <- cbind(1,bs(pseudotime))
         phi <- bs(pseudotime, intercept = TRUE)
       } else {
-        knots = seq(min(pseudotime), max(pseudotime), length.out = num.knot + 2)[2:(num.knot +
-                                                                                      1)]
+        knots = seq(min(pseudotime), max(pseudotime), length.out = num.knot + 2)[2:(num.knot + 1)]
         # phi <- cbind(1,bs(pseudotime,knots = knots))
         phi <- bs(pseudotime, knots = knots, intercept = TRUE)
       }
@@ -111,7 +111,8 @@ predict_fitting <-
       return(pred + populationFit[gene, , drop = FALSE])
     } else {
       l <- lapply(populationFit, function(i) {
-        pred + i[gene, pseudotime , drop = FALSE]
+        pred + i[gene, colnames(pred), drop = FALSE]
+        # pred
       })
       return(l)
     }

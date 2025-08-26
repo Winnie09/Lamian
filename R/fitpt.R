@@ -19,7 +19,8 @@
 #' @param knotnum If NULL (default), this function will automatically select the optimal number of knots for each gene. If specified by a numeric vector whose names are gene names, this function will used the specified number of knots for those genes. This argument is used to speed up the fitting if the number of knots has been known.
 #' @examples
 #' data(mandata)
-#' a = fitpt(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, ncores=1, model = 1)
+#' a = fitpt(expr = mandata$expr, cellanno = mandata$cellanno, pseudotime = mandata$pseudotime, design = mandata$design, testvar = 1,  maxknotallowed=5, EMmaxiter=10, EMitercutoff=10, ncores=1, model = 1)
+
 fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotallowed=10, EMmaxiter=100, EMitercutoff=0.05, ncores=1, model = 3, knotnum = NULL) {
   pseudotime <- pseudotime[colnames(expr)]
   cellanno <- cellanno[match(colnames(expr),cellanno[,1]),]
@@ -102,7 +103,7 @@ fitpt <- function(expr, cellanno, pseudotime, design, testvar=testvar,maxknotall
       }, simplify = F)
     } else if (model == 1) {
       xs <- sapply(row.names(design), function(i) {
-        kronecker(diag(num.knot + 4), design[i,-testvar])
+        kronecker(diag(num.knot + 4), design[i,-testvar]) 
       }, simplify = F)
     } else if (model == 2) {
       xs <- sapply(row.names(design), function(i) {  ## change X

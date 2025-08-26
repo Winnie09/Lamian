@@ -20,7 +20,7 @@
 #' @param break.0 logical. If TRUE (default), the heatmap color scale will strengthen the difference around 0
 #' @examples
 #' data(mantestobj)
-#' plotXDEHm(testobj = mantestobj)
+
 
 plotXDEHm <- function(testobj, showRowName = FALSE, cellWidthTotal = 250, cellHeightTotal = 400, showCluster = FALSE, colann = NULL, rowann = NULL, annotation_colors = NULL, subsampleCell = TRUE, numSubsampleCell=1e3, sep = NA, break.0 = TRUE){
   testvar = testobj$testvar

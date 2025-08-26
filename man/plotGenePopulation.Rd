@@ -7,7 +7,6 @@
 plotGenePopulation(
   testobj,
   gene = NA,
-  type = "time",
   ylim = NA,
   xlim = NA,
   sep = NA,
@@ -23,8 +22,6 @@ plotGenePopulation(
 \item{testobj}{the output object from lamian_test().}
 
 \item{gene}{a vector of genes that need to do the prediction.}
-
-\item{type}{One of c('Time', 'Variable').}
 
 \item{ylim}{y-axis limits to be passed to ggplot.}
 
@@ -50,7 +47,6 @@ This function takes a test output object as input and then plot the population l
 }
 \examples{
 data(mantestobj)
-plotGenePopulation(testobj = mantestobj, type = 'variable', gene = rownames(mantestobj$populationFit[[1]])[seq(1,2)])
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

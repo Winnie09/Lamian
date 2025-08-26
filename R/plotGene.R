@@ -9,7 +9,7 @@
 #' @export
 #' @param testobj object returned from lamian_test().
 #' @param gene a character vector of gene names. It can be of length 1 or > 1.
-#' @param type One of c('Time', 'Variable').
+#' @param type The test type of the object. One of c('Time', 'Variable'). 
 #' @param variable character, the variable (covariate) to color the samples, should be null or one of the column names of design matrix. Default is NULL, meaning each sample is colored differently. Otherwise, samples are colored by the variable (covariate) values.
 #' @param variable.text a character vector. The text for the legend of the plot, corresponding to each variable values.
 #' @param facet.sample logical. If TRUE (default), facet_wrap the samples.
@@ -29,12 +29,15 @@
 #' @param ncol number of colums for organizing all genes' plot.
 #' @param line.size the size of the curves.
 #' @param axis.text.blank logical. If TRUE, leave axis text as blank.
+#' @param se Standard error. Logical. If TRUE (default), plot the standard error of the fitted patterns. 
 #' @examples
 #' data(mantestobj)
-#' plotGene(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[1], variable = 'gender')
+#' plotGene(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[1], type = 'variable', variable = 'gender')
+           
 plotGene <-
   function(testobj,
            gene,
+           type = NA,
            variable = NULL,
            variable.text = NULL,
            free.scale = TRUE,
@@ -51,7 +54,10 @@ plotGene <-
            axis.text.blank = FALSE,
            cellProp = FALSE,
            x.lab = 'Pseudotime',
-           y.lab = 'Expression') {
+           y.lab = 'Expression',
+           se = TRUE) {
+    
+    test.type = type
     pseudotime <- testobj[['pseudotime']]
     cellanno <- testobj[['cellanno']]
     colnames(cellanno) <- c('Cell', 'Sample')
@@ -60,6 +66,19 @@ plotGene <-
     } else{
       expression <- testobj[['expr']]
     }
+    
+    if (is.na(test.type)){
+      if ('test.type' %in% names(testobj))  {
+        test.type = testobj$test.type
+      } else  if (length(testobj$populationFit) > 1){
+        test.type = 'Variable'
+      } else {
+        print('Please specify the object was tested by Time or Variable.')
+      }
+    } else {
+       test.type = type 
+    }
+    
       
     if (cellProp) {
       ptw <-
@@ -86,7 +105,7 @@ plotGene <-
     }
     
     predict.values <-
-      predict_fitting(testobj, gene = gene, test.type = testobj$test.type)
+      predict_fitting(testobj, gene = gene, test.type = test.type)
     pseudotime = pseudotime[colnames(expression)]
     cellanno <- cellanno[match(colnames(expression), cellanno[, 1]),]
     # predict.values <- predict.values[, colnames(expression),drop=FALSE]
@@ -130,7 +149,7 @@ plotGene <-
       linedlist <- lapply(unique(cellanno[, 2]), function(p) {
         # tmpcell <- cellanno[cellanno[,2]==p,1]
         tmpcellid <- which(cellanno[, 2] == p)
-        if (toupper(testobj$test.type) == 'TIME') {
+        if (toupper(test.type) == 'TIME') {
           ##### add
           tmpdf <- data.frame(
             expr = predict.values[gene, tmpcellid],
@@ -167,7 +186,8 @@ plotGene <-
               alpha = point.alpha,
               size = point.size
             ) +
-            geom_line(
+            geom_smooth( #### geom_line
+              se = se,
               data = ld,
               aes(
                 x = ld[,4],
@@ -180,7 +200,8 @@ plotGene <-
           
         } else {
           p <- ggplot() +
-            geom_line(
+            geom_smooth( #### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -204,7 +225,8 @@ plotGene <-
               alpha = point.alpha,
               size = point.size
             ) +
-            geom_line(
+            geom_smooth( ### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -217,7 +239,8 @@ plotGene <-
             )
         } else {
           p <- ggplot() +
-            geom_line(
+            geom_smooth( ### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -284,7 +307,7 @@ plotGene <-
         pdlist[[g]] <- pd
         linedlist <- lapply(unique(testobj$cellanno[, 2]), function(p) {
           tmpcellid <- which(cellanno[, 2] == p)
-          if (toupper(testobj$test.type) == 'TIME') {
+          if (toupper(test.type) == 'TIME') {
             ##### add
             tmpdf <- data.frame(
               expr = predict.values[g, tmpcellid],
@@ -337,7 +360,8 @@ plotGene <-
               alpha = point.alpha,
               size = point.size
             ) +
-            geom_line(
+            geom_smooth( ## ### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -350,7 +374,8 @@ plotGene <-
           
         } else {
           p <- ggplot() +
-            geom_line(
+            geom_smooth( ### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -375,7 +400,8 @@ plotGene <-
               alpha = point.alpha,
               size = point.size
             ) +
-            geom_line(
+            geom_smooth( ### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,
@@ -388,7 +414,8 @@ plotGene <-
             )
         } else {
           p <- ggplot() +
-            geom_line(
+            geom_smooth( ###### geom_line
+              se = se,
               data = ld,
               aes(
                 x = pseudotime,

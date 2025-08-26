@@ -37,7 +37,7 @@ This function generates an hdf5 file as the gene expression input to lamian_test
 }
 \examples{
 data(expdata)
-saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'data/multi.h5')
+saveh5(expr = expdata$expr, pseudotime = expdata$pseudotime, cellanno = expdata$cellanno, path = 'multi.h5')
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

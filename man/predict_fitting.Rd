@@ -11,7 +11,7 @@ predict_fitting(testObj, gene = NULL, test.type = "time")
 
 \item{gene}{a vector of genes that need to do the prediction.}
 
-\item{test.type}{One of c('Time', 'Variable').}
+\item{test.type}{One of c('Time', 'Variable') and case-insentivie.}
 }
 \value{
 a gene by cell (or pseudotime) expression matrix
@@ -20,5 +20,5 @@ a gene by cell (or pseudotime) expression matrix
 This function will predict the population fitting for genes using the output from lamian_test().
 }
 \author{
-Wenpin Hou <whou10@jhu.edu>
+Wenpin Hou <wp.hou3@gmail.com>
 }

@@ -54,5 +54,5 @@ a list of two elements. The first is for full model, while the second is for nul
 This function is used to perform model fitting in one permutation setting.
 }
 \author{
-Wenpin Hou <whou10@jhu.edu>
+Wenpin Hou <wh2526@cumc.columbia.edu>
 }

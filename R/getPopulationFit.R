@@ -9,14 +9,16 @@
 #' @param testobj output object of the function tespt().
 #' @param gene a vector of gene names
 #' @param type one of c('Time', 'Variable). Case insensitive.
+#' @param downsample logical. If TRUE, the cells will be downsampled, default number is num.timepoint = 1e3; if FALSE, the cells will not be downsampled.
 #' @param num.timepoint the number of time points used to fit the curve. Default is the minimum of 1e3 and max(pseudotime). This argument will reduce the running time of both this function and the downstream plot function if there are too many cells. 
 #' @examples
 #' data(mantestobj)
-#' a <- getPopulationFit(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[seq(1,3)], type = 'variable')
+#' a <- getPopulationFit(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[seq(1,3)], type = 'time')
 
 getPopulationFit <- function(testobj,
                              gene = NULL,
                              type = 'time',
+                             downsample = FALSE,
                              num.timepoint = 1e3){
   type <- toupper(type)
   if (!'testvar' %in% names(testobj)) {
@@ -33,10 +35,21 @@ getPopulationFit <- function(testobj,
   knotnum = testobj$knotnum
   pseudotime = testobj$pseudotime
   pseudotime = pseudotime[order(pseudotime)]
-  pt <- round(seq(1, max(pseudotime), length.out = min(num.timepoint, max(pseudotime)))) ## downsample
+  if (downsample){
+    if (num.timepoint > length(pseudotime)){
+      print('Number of existing cells exceeds target downsampling number. Ignoring downsampling...')
+      pt = pseudotime
+    } else {
+      print('Downsampling the cells...')
+      pt <- round(seq(1, length(pseudotime), length.out = min(num.timepoint, length(pseudotime)))) ## downsample the cells; select equidistant pseudotime time points  
+    }
+  } else {
+    pt = pseudotime
+  }
+    
   
   if (sum(design[, 1]) != nrow(design)){
-    print("The first column of design matrix should be all 1s (intercept)! Using the first column as the variable column ...")
+    print("The first column of design matrix should be all 1s (intercept)! We are inserting an all-1 column as the first column ...")
     design = cbind(intercept = 1, design)
     colnames(design)[1] <- 'intercept'
   }
@@ -98,12 +111,16 @@ getPopulationFit <- function(testobj,
       tmp <- t(sapply(fitlist, function(j){
         j[[i]]
       }))
+      colnames(tmp) = names(pseudotime)[pt]
     })  
     names(fitres) <- names(fitlist[[1]])
   } else if (type == 'TIME'){
     fitres <- t(do.call(cbind, fitlist))
     rownames(fitres) <- gene
     if (ncol(testobj$expr) == ncol(fitres)) colnames(fitres) <- colnames(testobj$expr)
+    colnames(fitres) = names(pseudotime)[pt]  
   }
+  
+  
   return(fitres)
 }

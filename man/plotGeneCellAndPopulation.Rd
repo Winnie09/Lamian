@@ -60,7 +60,6 @@ This function is used to plot genes' using their cellular level expression and t
 }
 \examples{
 data(mantestobj)
-plotGeneCellAndPopulation(testobj = mantestobj, type = 'variable', gene = rownames(mantestobj$populationFit[[1]])[seq(1,2)])
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

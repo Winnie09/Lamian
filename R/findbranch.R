@@ -21,7 +21,7 @@ findbranch <- function(mst, order, origin) {
   eg = data.frame(vertex[eg[, 1]], vertex[eg[, 2]], stringsAsFactors = FALSE)
   
   tmpbranch <- lapply(seq(1, nrow(eg)), function(i) {
-    sp <- shortest_paths(mst, from = eg[i, 1], to = eg[i, 2])$vpath[[1]]
+    sp <- igraph::shortest_paths(mst, from = eg[i, 1], to = eg[i, 2])$vpath[[1]]
     if (sum(vertex %in% sp) == 2)
       as.vector(sp)
   })

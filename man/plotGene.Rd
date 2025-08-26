@@ -7,6 +7,7 @@
 plotGene(
   testobj,
   gene,
+  type = NA,
   variable = NULL,
   variable.text = NULL,
   free.scale = TRUE,
@@ -23,13 +24,16 @@ plotGene(
   axis.text.blank = FALSE,
   cellProp = FALSE,
   x.lab = "Pseudotime",
-  y.lab = "Expression"
+  y.lab = "Expression",
+  se = TRUE
 )
 }
 \arguments{
 \item{testobj}{object returned from lamian_test().}
 
 \item{gene}{a character vector of gene names. It can be of length 1 or > 1.}
+
+\item{type}{The test type of the object. One of c('Time', 'Variable').}
 
 \item{variable}{character, the variable (covariate) to color the samples, should be null or one of the column names of design matrix. Default is NULL, meaning each sample is colored differently. Otherwise, samples are colored by the variable (covariate) values.}
 
@@ -65,7 +69,7 @@ plotGene(
 
 \item{y.lab}{a string to indicates y-axis label}
 
-\item{type}{One of c('Time', 'Variable').}
+\item{se}{Standard error. Logical. If TRUE (default), plot the standard error of the fitted patterns.}
 
 \item{ylim}{y-axis limits to be passed to ggplot.}
 
@@ -79,7 +83,7 @@ This function is used to plot gene(s) by showing both of the original cellcular 
 }
 \examples{
 data(mantestobj)
-plotGene(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[1], variable = 'gender')
+plotGene(testobj = mantestobj, gene = rownames(mantestobj$populationFit[[1]])[1], type = 'variable', variable = 'gender')
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

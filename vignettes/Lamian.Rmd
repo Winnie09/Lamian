@@ -18,11 +18,11 @@ author:
   name: Hongkai Ji\*
 date: '`r format(Sys.time(), "%d %B , %Y")`'
 output:
-  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_depth: '3'
+  pdf_document: default
   rmarkdown::html_document:
     toc: yes
     toc_depth: 3
@@ -48,11 +48,9 @@ Pseudotime analysis based on single-cell RNA-seq (scRNA-seq) data has been widel
 
 We develop a systematic computational and statistical framework, Lamian, for multi-sample pseudotime analysis. Given scRNA-seq data from multiple biological samples with covariates (e.g., age, sex, sample type, disease status, etc.), this framework allows one to (1) construct cellular pseudotemporal trajectory, evaluate the uncertainty of the trajectory branching structure, (2) evaluate changes in branching structure associated with sample covariates, (3) identify changes in cell abundance and gene expression along the pseudotime, and (4) characterize how sample covariates modifies the pseudotemporal dynamics of cell abundance and gene expression. Importantly, when identifying cell abundance or gene expression changes associated with pseudotime and sample covariates, Lamian accounts for variability across biological samples which other existing pseudotime methods do not consider. As a result, Lamian is able to more appropriately control the false discovery rate (FDR) when analyzing multi-sample data, a property not offered by any other methods. 
 
-For more details, see our paper describing the **Lamian** package:
+Further information can be found in our paper describing the **Lamian** package:
 
-- A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples. 
-Wenpin Hou, Zhicheng Ji, Zeyu Chen, E John Wherry, Stephanie C Hicks\*, Hongkai Ji\*. 
-bioRxiv 2021.07.10.451910; doi: https://doi.org/10.1101/2021.07.10.451910
+- Hou, W., Ji, Z., Chen, Z., Wherry, E.J., Hicks, S.*, and Ji, H.* A statistical framework for differential pseudotime analysis with multiple single-cell RNA-seq samples. [Nature Communications 14, 7286 (2023)](https://www.nature.com/articles/s41467-023-42841-y).
 
 # Download 
 
@@ -201,12 +199,14 @@ The function `lamian.test()` is designed to perform multiple tests. To perform t
 
 For ultra-large datasets, for example when there are hundreds of samples each of which consists of hundreds to thousands of cells, we recommend using the hdf5 format to store the gene expression information instead of a matrix.  This step significantly reduces the memory usage of each round, and therefore in a parallel mode the program can run more rounds and be completed at a faster speed.
 
-To save the gene expression in hdf5 file format, we apply the following codes which creates a new file **data/multi.h5** (file *multi.h5* in the folder *data/* )
+To save the gene expression in hdf5 file format, we apply the following codes which creates a new file **multi.h5** (we deposited this file *multi.h5* in the package folder *data/* )
 ```{r eval=FALSE}
+if (requireNamespace("rhdf5", quietly = TRUE)) rhdf5::h5closeAll()
+
 saveh5(expr = expdata$expr, 
        pseudotime = expdata$pseudotime, 
        cellanno = expdata$cellanno, 
-       path = 'data/multi.h5')
+       path = 'multi.h5')
 ```
 
 
@@ -235,6 +235,7 @@ Res <- lamian_test(
   ## This is for permutation test only. 
   ## We suggest that users use default permuiter = 100.
   ## Alternatively, we can use test.method = 'chisq' to swich to the chi-square test.
+  # test.method='chisq',
   ncores = 1
 )
 ```
@@ -242,8 +243,8 @@ Res <- lamian_test(
 
 If the gene expression is in an hdf5 file format,
 ```{r eval=FALSE}
-Res <- lamian_test_h5(
-  expr = 'data/multi.h5',
+Res.h5 <- lamian_test_h5(
+  expr = 'multi.h5',
   cellanno = expdata$cellanno,
   pseudotime = expdata$pseudotime,
   design = expdata$design,
@@ -334,8 +335,8 @@ Res <- lamian_test(
 
 If the gene expression is in an hdf5 file format,
 ```{r eval=FALSE}
-Res <- lamian_test_h5(
-  expr = 'data/multi.h5',
+Res.h5 <- lamian_test_h5(
+  expr = 'multi.h5',
   cellanno = expdata$cellanno,
   pseudotime = expdata$pseudotime,
   design = expdata$design,
@@ -378,8 +379,7 @@ plotTDEHm(
   Res,
   subsampleCell  = FALSE,
   showCluster = TRUE,
-  type = 'time',
-  cellWidthTotal = 200,
+  cellWidthTotal = 160,
   cellHeightTotal = 200
 )
 ```
@@ -408,7 +408,7 @@ Res <-
   cellPropTest(
     cellanno = expdata$cellanno,
     pseudotime = expdata$pseudotime,
-    design = expdata$design[, 1, drop = F],
+    design = expdata$design,
     ncores = 4,
     test.type = 'Time'
   )
@@ -416,7 +416,7 @@ Res <-
 
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
 ```{r}
-head(Res$statistics)
+Res$statistics
 ```
 
 ## XCD test
@@ -434,6 +434,9 @@ Res <-
   )
 ```
 The dataframe **statistics** in the **Res** object contains the test result: a *p*-value **pval.overall** and a effect size *z*-score **z.overall**.
+```{r}
+Res$statistics
+```
 
 
 # Apply other pseudotime inference methods in Lamian: take slingshot as an example
@@ -448,7 +451,7 @@ data(slingshot_data)
 
 Load the package `slingshot` and its dependencies. Prepare the data objects, the low-dimentional representation (here we use principal components), and clusters.
 ```{r}
-suppressMessages(library(slingshot))
+suppressMessages(library(slingshot)) ## install it from Bioconductor if encounter an R version issue
 suppressMessages(library(SingleCellExperiment))
 suppressMessages(library(mclust))
 
@@ -462,8 +465,9 @@ colData(sce)$GMM <- cl1
 
 Run `slingshot()` to obtain cellcular pseudotime. At the same time, we check the running time using `system.time()`.
 ```{r}
+library(DelayedMatrixStats)
 system.time({
-  sce <- slingshot(sce, clusterLabels = 'GMM', reducedDim = 'PCA')
+  sce <- slingshot::slingshot(sce, clusterLabels = 'GMM', reducedDim = 'PCA')
 })
 ```
 
@@ -477,7 +481,7 @@ plot(reducedDims(sce)$PCA,
      asp = 1, 
      xlab = 'Principal component 1', 
      ylab = 'Principal component 2')
-lines(SlingshotDataSet(sce), lwd=2, type = 'lineages', col = 'black')
+lines(slingshot::SlingshotDataSet(sce), lwd=2, type = 'lineages', col = 'black')
 ```
 
 For example, we can visualize the first lineage `pseudotime_1` constructed by `slingshot`.
@@ -491,13 +495,15 @@ plot(reducedDims(sce)$PCA,
      asp = 1, 
      xlab = 'Principal component 1', 
      ylab = 'Principal component 2')
-lines(SlingshotDataSet(sce)@curves[[1]], lwd=2, col='black')
+lines(slingshot::SlingshotDataSet(sce)@curves[[1]], lwd=2, col='black')
 ```
 
 In  practice, users may select any interesting lineage. In the following, we suppose users are interested in the first lineage. We can then subset the cellular pseudotime in the first lineage. 
 ```{r}
 pt <- sce$slingPseudotime_1
-names(pt) <- colnames(cnt) ## A vector with names is easier to handle in subsetting.
+
+## Important: A vector with names is easier to handle in subsetting. 
+names(pt) <- colnames(cnt)
 ```
 
 > The following steps are **important** when using any pseudotime inference methods, not only for slingshot's data. 
@@ -505,7 +511,9 @@ names(pt) <- colnames(cnt) ## A vector with names is easier to handle in subsett
 First, check the cellcular pseudotime distribution. We can see that it contains `NA`, meaning that some cells do not have pseudotime, so we can't use these cells in the differential temporal analysis. We need to select the cells that have pseudotime.
 ```{r}
 summary(pt)
-pt <- pt[!is.na(pt)] ## important
+
+## Important: remove pseudotime that is NA 
+pt <- pt[!is.na(pt)] 
 selectedCell <- names(pt)
 ```
 

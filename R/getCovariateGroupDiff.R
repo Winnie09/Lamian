@@ -14,7 +14,7 @@
 #' @param testvar a numeric number indicating the column in the design matrix that needs to be used to obtain the covariate group difference. Default is 2. testvar = 2 means the second column in the design matrix.
 #' @examples
 #' data(mantestobj)
-#' a = getCovariateGroupDiff(testobj = mantestobj, gene = rownames(expr)[seq_len(2)])
+#' a = getCovariateGroupDiff(testobj = mantestobj, gene = rownames(mantestobj$expr)[seq_len(2)])
 
 getCovariateGroupDiff <- function(testobj,
                                   gene, 

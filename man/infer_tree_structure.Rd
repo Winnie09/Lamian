@@ -46,11 +46,9 @@ a list
 This function takes a low dimensional-reduction representation (for example, pca), the cell annotation, etc. as inputs, and then infer the pseudotime tree structures for further assessing the uncertainty of each of the pseudotime tree branches.
 }
 \examples{
-data(hca_bm_pca)
-data(hca_bm_saver)
-data(hca_bm_cellanno)
-res = infer_tree_structure(pca = hca_bm_pca, expression = hca_bm_saver, cellanno = hca_bm_cellanno, origin.marker = c('CD34'), xlab='Principal component 1', ylab = 'Principal component 2')
+data(man_tree_data)
+res = infer_tree_structure(pca = man_tree_data[['pca']], cellanno = man_tree_data[['cellanno']], expression = man_tree_data[['expression']], origin.marker = c('CD34'), number.cluster = 5, xlab='Principal component 1', ylab = 'Principal component 2')
 }
 \author{
-Wenpin Hou <whou10@jhu.edu>
+Wenpin Hou <wp.hou3@gmail.com>
 }

@@ -52,7 +52,6 @@ This function is used for plotting the fitting heatmaps for the XDE test.
 }
 \examples{
 data(mantestobj)
-plotXDEHm(testobj = mantestobj)
 }
 \author{
 Wenpin Hou <whou10@jhu.edu>

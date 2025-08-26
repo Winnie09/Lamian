@@ -22,7 +22,6 @@
 #' @param axis.text.blank logical. If TRUE, leave axis text as blank.
 #' @examples
 #' data(mantestobj)
-#' plotGeneCellAndPopulation(testobj = mantestobj, type = 'variable', gene = rownames(mantestobj$populationFit[[1]])[seq(1,2)])
 
 plotGeneCellAndPopulation <- function(testobj,
                                       gene = NA,

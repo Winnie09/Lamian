@@ -12,6 +12,7 @@
 #' @param type One of c('Time', 'Variable').
 #' @param method The clustering method. "kmeans" (default) for k-means clustering,  "hierarchical" for hierarchical clustering, "louvain" for Louvain clustering, and "GMM" for Model-based clustering.
 #' @param scale.difference logical. If FALSE, then do not standarize the group difference, but only scale by the maximum value of the group difference absolute values. If TRUE, then standardize the group difference before doing the clustering.
+
 cluster_gene <- function(testobj, 
                          gene,
                          k,
@@ -20,6 +21,7 @@ cluster_gene <- function(testobj,
                          method = 'kmeans', 
                          scale.difference = F,
                          seed = 12345){
+  ## Extract population fitting
   if (toupper(type) == 'TIME'){ 
     if ('populationFit' %in% names(testobj)) {
       fit <- testobj$populationFit
@@ -30,9 +32,11 @@ cluster_gene <- function(testobj,
     if ('covariateGroupDiff' %in% names(testobj)){
       fit <- testobj$covariateGroupDiff
     } else{
-      fit <- getCovariateGroupDiff(testobj = testobj, gene = gene)  
+      fit <- getCovariateGroupDiff(testobj = testobj, gene = gene)
     }
   }
+  
+  ## if TRUE, need to standardize the group fitting (or group difference in XDE); if FALSE, linearly scale it
   if (scale.difference){
     mat.scale <- scalematrix(fit[gene, ,drop=F])
   } else {
@@ -40,6 +44,7 @@ cluster_gene <- function(testobj,
     mat.scale <- fit[gene, ,drop=F]/max
   }
   
+  ## clustering the genes
   if (method == 'kmeans'){
     set.seed(seed)
     # 
@@ -81,7 +86,7 @@ cluster_gene <- function(testobj,
   v <- sapply(unique(clu), function(i){
     ap <- which(colMeans(mat.scale[names(clu)[clu==i], -ncol(mat.scale), drop=FALSE]) * colMeans(mat.scale[names(clu)[clu==i], -1, drop = FALSE]) < 0)
     if(length(ap) == 0){
-      1
+      which.max(colMeans(mat.scale[names(clu[clu==i]),,drop=F]))
     } else{
       ap[which.min(abs(ap-ncol(mat.scale)/2))]  
     }
@@ -91,12 +96,14 @@ cluster_gene <- function(testobj,
   corv <- apply(mat.scale,1,cor,1:ncol(mat.scale))
   corv <- tapply(corv,list(clu),mean)
   corv <- corv[names(v)]
+  
   # self study
   v[corv < 0] <- ncol(mat.scale)-v[corv < 0]
   if (toupper(type) == 'VARIABLE'){
     v <- v * (2*(corv > 0)-1)
   }
   
+  ## renamed the sorted clusters as cluster 1, 2, etc..
   trans <- cbind(as.numeric(names(sort(v))),1:length(v))
   n <- names(clu)
   clu <- trans[match(clu,trans[,1]),2]
@@ -107,6 +114,7 @@ cluster_gene <- function(testobj,
   } else {
     clu2 <- paste0(clu, ';TRUE')
   }
+  
   uclu2 <- sort(unique(clu2))
   clu2 <- match(clu2,uclu2)
   names(clu2) <- n

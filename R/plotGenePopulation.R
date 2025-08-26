@@ -4,7 +4,6 @@
 #'
 #' @param testobj the output object from lamian_test().
 #' @param gene a vector of genes that need to do the prediction.
-#' @param type One of c('Time', 'Variable').
 #' @param ylim y-axis limits to be passed to ggplot.
 #' @param xlim x-axis limits to be passed to ggplot.
 #' @param sep a string in the gene names that needs to replaced with blank.
@@ -19,11 +18,9 @@
 #' @author Wenpin Hou <whou10@jhu.edu>
 #' @examples
 #' data(mantestobj)
-#' plotGenePopulation(testobj = mantestobj, type = 'variable', gene = rownames(mantestobj$populationFit[[1]])[seq(1,2)])
 
 plotGenePopulation <- function(testobj,
                                gene = NA,
-                               type = 'time',
                                ylim = NA,
                                xlim = NA,
                                sep = NA,
@@ -33,6 +30,7 @@ plotGenePopulation <- function(testobj,
                                subSampleNumber = NA,
                                line.size = 1,
                                axis.text.blank = FALSE) {
+  
   if (is.na(ncol))
     nrow = round(sqrt(length(gene)))
   else
@@ -42,19 +40,27 @@ plotGenePopulation <- function(testobj,
   else
     'fixed'
   if ('populationFit' %in% names(testobj))
-    fit <-
-    testobj$populationFit
+    fit <- testobj$populationFit
   else
     fit = getPopulationFit(testobj, gene = gene, type = type)
   
-  if (type == 'time') {
-    if (is.na(gene))
-      gene <- rownames(fit)
+  type <- if (is.list(fit)) "Variable" else "Time"
+  
+  if (toupper(type) == 'TIME') {
+    if (length(gene) == 1){
+      if (is.na(gene)){
+        gene <- rownames(fit)[1]
+      }
+    }
+      
+    
     pd <- sapply(gene, function(g) {
-      if (!is.na(sep))
+      if (!is.na(sep)) {
         g2 <- sub(sep, '', g)
-      else
+      } else {
         g2 = g
+      }
+        
       tmp <-
         data.frame(
           gene = g2,
@@ -72,7 +78,6 @@ plotGenePopulation <- function(testobj,
       pd$gene <- factor(as.character(pd$gene), levels = gene)
     }
     
-    
     p <-
       ggplot2::ggplot(data = pd, aes(x = pd[,3], y = pd[,2], color = 'red')) +
       geom_line(size = line.size) +
@@ -86,8 +91,12 @@ plotGenePopulation <- function(testobj,
       p <- p + facet_wrap( ~ gene, ncol = ncol, scales = a)
     }
   } else {
-    if (is.na(gene))
-      gene <- rownames(fit[[1]])
+    if (length(gene) == 1){
+      if (is.na(gene)){
+        gene <- rownames(fit[[1]])[1]
+      }
+    }
+      
     pd <- sapply(seq_len(length(fit)), function(i) {
       tmp <- reshape2::melt(fit[[i]][gene, , drop = FALSE])
       if (!is.na(subSampleNumber)) {
@@ -104,6 +113,7 @@ plotGenePopulation <- function(testobj,
         tmp <-
           tmp[sample(seq_len(nrow(tmp)), subSampleNumber), , drop = FALSE]
       }
+      
       tmp <- data.frame(tmp,
                         type = names(fit)[i],
                         stringsAsFactors = FALSE)
